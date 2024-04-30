@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="BridgeInspectionApp.MainPage">
+
+    <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
+
+        <Button Text="桥梁照片管理" 
+                VerticalOptions="CenterAndExpand" 
+                Clicked="OnManagePhotosClicked"/>
+        <Button Text="记录桥梁信息" 
+                VerticalOptions="CenterAndExpand" 
+                Clicked="OnRecordInfoClicked"/>
+        <Button Text="查看桥梁信息" 
+                VerticalOptions="CenterAndExpand" 
+                Clicked="OnViewInfoClicked"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>

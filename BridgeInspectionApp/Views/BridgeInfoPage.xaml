@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.BridgeInfoPage">
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30">
+            <Entry x:Name="NameEntry" Placeholder="桥梁名称"/>
+            <Entry x:Name="ComponentPartEntry" Placeholder="构件部位"/>
+            <Entry x:Name="DefectTypeEntry" Placeholder="缺损类型"/>
+            <Entry x:Name="DefectLocationEntry" Placeholder="缺损位置"/>
+            <Entry x:Name="DefectSeverityEntry" Placeholder="缺损程度"/>
+            <Button Text="保存信息" Clicked="OnSaveInfoClicked"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

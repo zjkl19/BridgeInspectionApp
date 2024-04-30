@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.BridgeInfoViewPage"
+             Title="BridgeInfoViewPage">
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30">
+            <Label Text="这里将展示桥梁信息" HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
