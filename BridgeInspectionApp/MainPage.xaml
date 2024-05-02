@@ -7,17 +7,11 @@
              x:Class="BridgeInspectionApp.MainPage">
 
     <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
-
-        <Button Text="桥梁照片管理" 
-                VerticalOptions="CenterAndExpand" 
-                Clicked="OnManagePhotosClicked"/>
-        <Button Text="记录桥梁信息" 
-                VerticalOptions="CenterAndExpand" 
-                Clicked="OnRecordInfoClicked"/>
+        <Button Text="选择桥梁" Clicked="SelectBridge_Clicked"/>
         <Button Text="查看桥梁信息" 
                 VerticalOptions="CenterAndExpand" 
                 Clicked="OnViewInfoClicked"/>
-
     </VerticalStackLayout>
+    
 
 </ContentPage>

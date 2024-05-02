@@ -4,21 +4,35 @@ namespace BridgeInspectionApp.Views;
 
 public partial class BridgeInfoPage : ContentPage
 {
-	public BridgeInfoPage()
-	{
-		InitializeComponent();
-	}
-    private async void OnSaveInfoClicked(object sender, EventArgs e)
-    {
-        var bridgeInfo = new BridgeInfo
-        {
-            Name = NameEntry.Text,
-            ComponentPart = ComponentPartEntry.Text,
-            DefectType = DefectTypeEntry.Text,
-            DefectLocation = DefectLocationEntry.Text,
-            DefectSeverity = DefectSeverityEntry.Text
-        };
+    private string bridgeName;
 
-        // 保存 bridgeInfo 对象到数据库或本地存储
+    public BridgeInfoPage(string bridgeName)
+    {
+        InitializeComponent();
+        this.bridgeName = bridgeName;
+    }
+
+    private async void TakePhoto_Clicked(object sender, EventArgs e)
+    {
+        var photo = await MediaPicker.CapturePhotoAsync();
+        if (photo != null)
+        {
+            // 保存或处理照片流
+        }
+    }
+
+    private async void PickPhoto_Clicked(object sender, EventArgs e)
+    {
+        var photo = await MediaPicker.PickPhotoAsync();
+        if (photo != null)
+        {
+            // 保存或处理照片流
+        }
+    }
+
+    private async void SaveInfo_Clicked(object sender, EventArgs e)
+    {
+        // 保存桥梁缺损信息
+        await DisplayAlert("保存成功", "桥梁缺损信息已保存。", "OK");
     }
 }
