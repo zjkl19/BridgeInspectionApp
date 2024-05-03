@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.BridgeEditPage"
+             Title="编辑桥梁信息">
+    <VerticalStackLayout Padding="30">
+        <Entry x:Name="nameEntry" Placeholder="桥梁名称" Text="{Binding Name}" />
+        <Entry x:Name="locationEntry" Placeholder="位置" Text="{Binding Location}" />
+        <Button Text="保存" Clicked="OnSaveClicked" />
+    </VerticalStackLayout>
+</ContentPage>

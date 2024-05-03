@@ -8,12 +8,19 @@
             <CollectionView x:Name="bridgesCollection">
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <StackLayout Padding="10">
-                            <Label Text="{Binding Name}" FontSize="Medium" />
-                            <Label Text="{Binding Location}" FontSize="Small" />
-                            <!-- 添加显示更多信息的标签 -->
-                            <Label Text="{Binding Defects.Count}" FontSize="Small" TextColor="Gray" />
-                        </StackLayout>
+                        <Frame BorderColor="LightGray" Margin="10" Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding Name}" FontSize="Medium" />
+                                <Label Text="{Binding Location}" FontSize="Small" />
+
+                                <!-- 水平布局按钮 -->
+                                <HorizontalStackLayout Spacing="10">
+                                    <Button Text="编辑" BackgroundColor="Blue" Clicked="OnEditClicked" />
+                                    <Button Text="删除" BackgroundColor="Red" Clicked="OnDeleteClicked" />
+                                    <Button Text="病害管理" BackgroundColor="Green" Clicked="OnManageDefectsClicked" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
