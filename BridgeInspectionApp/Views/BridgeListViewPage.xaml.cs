@@ -84,8 +84,11 @@ public partial class BridgeListViewPage : ContentPage
     }
 
 
-    private void OnManageDefectsClicked(object sender, EventArgs e)
+    private async void OnManageDefectsClicked(object sender, EventArgs e)
     {
-        // 管理病害逻辑
+        // 创建 DefectsListPage 的实例
+        var defectsPage = new DefectsListPage();
+        // 使用导航服务导航到 DefectsListPage
+        await Navigation.PushAsync(defectsPage);
     }
 }

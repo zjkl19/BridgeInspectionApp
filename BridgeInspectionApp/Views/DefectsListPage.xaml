@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.DefectsListPage"
+             Title="病害管理">
+    <ScrollView>
+        <VerticalStackLayout>
+            <CollectionView x:Name="defectsCollection">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame BorderColor="LightGray" Margin="10" Padding="10">
+                            <VerticalStackLayout>
+                                <Label Text="{Binding ComponentPart}" FontSize="Medium" />
+                                <Label Text="{Binding DefectType}" FontSize="Small" />
+                                <Label Text="{Binding DefectLocation}" FontSize="Small" />
+                                <Label Text="{Binding DefectSeverity}" FontSize="Small" />
+                                <Label Text="{Binding Note}" FontSize="Small" />
+                                <!-- Buttons for edit and delete -->
+                                <HorizontalStackLayout  Spacing="10">
+                                    <Button Text="编辑" BackgroundColor="Blue" Clicked="OnEditDefectClicked" />
+                                    <Button Text="删除" BackgroundColor="Red" Clicked="OnDeleteDefectClicked" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Button Text="新增病害" Clicked="OnAddDefectClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
