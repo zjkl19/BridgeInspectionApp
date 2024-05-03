@@ -11,6 +11,8 @@
                         <StackLayout Padding="10">
                             <Label Text="{Binding Name}" FontSize="Medium" />
                             <Label Text="{Binding Location}" FontSize="Small" />
+                            <!-- 添加显示更多信息的标签 -->
+                            <Label Text="{Binding Defects.Count}" FontSize="Small" TextColor="Gray" />
                         </StackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

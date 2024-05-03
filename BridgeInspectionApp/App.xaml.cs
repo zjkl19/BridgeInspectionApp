@@ -1,6 +1,6 @@
 ﻿using BridgeInspectionApp.Data;
 using BridgeInspectionApp.Models;
-
+using BridgeInspectionApp.Services;
 using Microsoft.Maui.Controls;
 using System.Threading.Tasks;
 
@@ -11,19 +11,31 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-
+        DeleteExistingDatabase();
+        SetupDatabase();
+        MainPage = new NavigationPage(new MainPage());
+    }
+    private void DeleteExistingDatabase()
+    {
+        var databasePath = Path.Combine(FileSystem.AppDataDirectory, "BridgeDatabase.db");
+        if (File.Exists(databasePath))
+        {
+            File.Delete(databasePath);
+        }
+    }
+    private void SetupDatabase()
+    {
         CheckPermissions().ContinueWith(t =>
         {
             // 确保权限检查完成后再显示主页面
             MainPage = new NavigationPage(new MainPage());
         }, TaskScheduler.FromCurrentSynchronizationContext());  // 确保在主线程上更新UI
-        using (var db = new BridgeContext())
-        {
-            db.Database.EnsureCreated();  // 确保数据库创建
-            SeedDatabase(db);  // 填充测试数据
-        }
-
-        MainPage = new NavigationPage(new MainPage());
+        PhotoService.GenerateTestPhotos();
+        using var db = new BridgeContext();
+        
+        db.Database.EnsureDeleted();  // 确保删除旧数据库
+        db.Database.EnsureCreated();  // 创建新数据库
+        SeedDatabase(db);  // 填充测试数据
     }
 
     public async Task CheckPermissions()
@@ -53,60 +65,79 @@ public partial class App : Application
     }
     private void SeedDatabase(BridgeContext db)
     {
-        if (!db.Bridges.Any())
+        try
         {
-            db.Bridges.Add(new Bridge
+            if (!db.Bridges.Any())
             {
-                Name = "Golden Gate Bridge",
-                Location = "San Francisco, CA",
-                Defects = new List<Defect>
-            {
-                new Defect
+                var bridge1 = new Bridge
+                {
+                    Name = "Golden Gate Bridge",
+                    Location = "San Francisco, CA",
+                };
+
+                var defect1 = new Defect
                 {
                     ComponentPart = "Surface",
                     DefectType = "Crack",
                     DefectLocation = "North end",
                     DefectSeverity = "Moderate",
-                    Description = "Surface crack on north end"
-                },
-                new Defect
-                {
-                    ComponentPart = "Cables",
-                    DefectType = "Corrosion",
-                    DefectLocation = "Main span",
-                    DefectSeverity = "Severe",
-                    Description = "Significant rusting on cables"
-                }
-            }
-            });
+                    Note = "Requires immediate attention due to safety concerns.",
+                    BridgeId = bridge1.Id
+                };
 
-            db.Bridges.Add(new Bridge
-            {
-                Name = "Brooklyn Bridge",
-                Location = "New York, NY",
-                Defects = new List<Defect>
-            {
-                new Defect
+                var photo1 = new Photo
                 {
-                    ComponentPart = "Walkway",
-                    DefectType = "Deformation",
-                    DefectLocation = "East side",
-                    DefectSeverity = "Low",
-                    Description = "Minor deformation on walkway"
-                },
-                new Defect
+                    FilePath = "path/to/photo1.jpg",
+                    Note = "Initial crack photo",
+                    DefectId = defect1.Id
+                };
+                // 将缺陷关联到桥梁
+                bridge1.Defects = new List<Defect> { defect1 };
+
+                // 将照片关联到缺陷
+                defect1.Photos = new List<Photo> { photo1 };
+                db.Bridges.Add(bridge1);
+
+                var bridge2 = new Bridge
                 {
-                    ComponentPart = "Pillar",
+                    Name = "Golden Gate Bridge2",
+                    Location = "San Francisco, CA",
+                };
+
+                var defect2 = new Defect
+                {
+                    ComponentPart = "Surface",
                     DefectType = "Crack",
-                    DefectLocation = "Base",
-                    DefectSeverity = "High",
-                    Description = "Major crack in one of the pillars"
-                }
-            }
-            });
+                    DefectLocation = "North end",
+                    DefectSeverity = "Moderate",
+                    Note = "Requires immediate attention due to safety concerns.",
+                    BridgeId = bridge2.Id
+                };
 
-            db.SaveChanges();
+                var photo2 = new Photo
+                {
+                    FilePath = "path/to/photo2.jpg",
+                    Note = "Initial crack photo",
+                    DefectId = defect2.Id
+                };
+                // 将缺陷关联到桥梁
+                bridge2.Defects = new List<Defect> { defect2 };
+
+                // 将照片关联到缺陷
+                defect2.Photos = new List<Photo> { photo2 };
+                db.Bridges.Add(bridge2);
+
+                db.SaveChanges();
+
+            }
         }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        
     }
+
 
 }
