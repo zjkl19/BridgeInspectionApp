@@ -86,9 +86,16 @@ public partial class BridgeListViewPage : ContentPage
 
     private async void OnManageDefectsClicked(object sender, EventArgs e)
     {
-        // 创建 DefectsListPage 的实例
-        var defectsPage = new DefectsListPage();
-        // 使用导航服务导航到 DefectsListPage
-        await Navigation.PushAsync(defectsPage);
+        var button = sender as Button;
+        if (button != null)
+        {
+            var bridge = button.BindingContext as Bridge;
+            if (bridge != null)
+            {
+                // 传递桥梁ID到DefectsListPage
+                var defectsPage = new DefectsListPage(bridge.Id);
+                await Navigation.PushAsync(defectsPage);
+            }
+        }
     }
 }
