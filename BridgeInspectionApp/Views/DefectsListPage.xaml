@@ -3,44 +3,50 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BridgeInspectionApp.Views.DefectsListPage"
              Title="病害管理">
-    <ScrollView>
-        <VerticalStackLayout>
-            <CollectionView x:Name="defectsCollection" ItemsSource="{Binding Defects}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame BorderColor="LightGray" Margin="10" Padding="10">
-                            <VerticalStackLayout>
-                                <Label Text="{Binding ComponentPart}" FontSize="Medium" />
-                                <Label Text="{Binding DefectType}" FontSize="Small" />
-                                <Label Text="{Binding DefectLocation}" FontSize="Small" />
-                                <Label Text="{Binding DefectSeverity}" FontSize="Small" />
-                                <Label Text="{Binding Note}" FontSize="Small" />
+    <VerticalStackLayout>
+        <!-- 显示桥梁名称 -->
+        <Label Text="{Binding BridgeName}" FontSize="Large" HorizontalOptions="Center" Margin="10"/>
+        <!-- 新增病害按钮 -->
+        <Button Text="新增病害" Command="{Binding AddDefectCommand}" HorizontalOptions="Center" Style="{StaticResource PrimaryButton}"/>
 
-                                <!-- Display associated photos with additional information -->
-                                <CollectionView ItemsSource="{Binding Photos}" ItemsLayout="HorizontalList">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Frame Padding="5" Margin="5">
-                                                <StackLayout>
-                                                    <Image Source="{Binding FilePath}" HeightRequest="100" WidthRequest="100" Aspect="AspectFill"/>
-                                                    <Label Text="{Binding Note}" FontSize="Small"/>
-                                                </StackLayout>
-                                            </Frame>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
+        <ScrollView  VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <VerticalStackLayout>
+                <CollectionView x:Name="defectsCollection" ItemsSource="{Binding Defects}"  >
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BorderColor="LightGray" Margin="10" Padding="10">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding ComponentPart}" FontSize="Medium" />
+                                    <Label Text="{Binding DefectType}" FontSize="Small" />
+                                    <Label Text="{Binding DefectLocation}" FontSize="Small" />
+                                    <Label Text="{Binding DefectSeverity}" FontSize="Small" />
+                                    <Label Text="{Binding Note}" FontSize="Small" />
 
-                                <!-- Buttons for edit and delete -->
-                                <HorizontalStackLayout Spacing="10">
-                                    <Button Text="编辑" Command="{Binding EditCommand}" BackgroundColor="Blue" />
-                                    <Button Text="删除" Command="{Binding DeleteCommand}" BackgroundColor="Red" />
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-            <Button Text="新增病害" Clicked="OnAddDefectClicked" />
-        </VerticalStackLayout>
+                                    <!-- Display associated photos with additional information -->
+                                    <CollectionView ItemsSource="{Binding Photos}" ItemsLayout="HorizontalList">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Frame Padding="5" Margin="5">
+                                                    <StackLayout>
+                                                        <Image Source="{Binding FilePath}" HeightRequest="100" WidthRequest="100" Aspect="AspectFill"/>
+                                                        <Label Text="{Binding Note}" FontSize="Small"/>
+                                                    </StackLayout>
+                                                </Frame>
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+
+                                    <!-- Buttons for edit and delete -->
+                                    <HorizontalStackLayout Spacing="10">
+                                        <Button Text="编辑" Command="{Binding EditCommand}" BackgroundColor="Blue" />
+                                        <Button Text="删除" Command="{Binding DeleteCommand}" BackgroundColor="Red" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
     </ScrollView>
+    </VerticalStackLayout>
 </ContentPage>

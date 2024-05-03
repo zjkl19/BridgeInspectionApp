@@ -164,7 +164,19 @@ public partial class App : Application
                     DefectId = defect4.Id
                 };
                 defect4.Photos = [photo4, photo5];
-                bridge2.Defects = [defect3, defect4];
+
+                // 第3个病害 - 裂缝
+                var defect5 = new Defect
+                {
+                    ComponentPart = "路面3",
+                    DefectType = "裂缝",
+                    DefectLocation = "接缝处",
+                    DefectSeverity = "轻度",
+                    Note = "路面接缝处出现裂缝，需要修补。",
+                    BridgeId = bridge2.Id
+                };
+
+                bridge2.Defects = [defect3, defect4, defect5];
 
                 db.Bridges.Add(bridge1);
                 db.Bridges.Add(bridge2);

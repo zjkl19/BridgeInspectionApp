@@ -92,8 +92,7 @@ public partial class BridgeListViewPage : ContentPage
             var bridge = button.BindingContext as Bridge;
             if (bridge != null)
             {
-                // ´«µÝÇÅÁºIDµ½DefectsListPage
-                var defectsPage = new DefectsListPage(bridge.Id);
+                var defectsPage = new DefectsListPage(bridge.Id, bridge.Name);
                 await Navigation.PushAsync(defectsPage);
             }
         }
