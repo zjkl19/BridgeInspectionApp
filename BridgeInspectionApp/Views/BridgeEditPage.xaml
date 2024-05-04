@@ -2,10 +2,24 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BridgeInspectionApp.Views.BridgeEditPage"
+             xmlns:vm="clr-namespace:BridgeInspectionApp.ViewModels"
              Title="编辑桥梁信息">
-    <VerticalStackLayout Padding="30">
-        <Entry x:Name="nameEntry" Placeholder="桥梁名称" Text="{Binding Name}" />
-        <Entry x:Name="locationEntry" Placeholder="位置" Text="{Binding Location}" />
-        <Button Text="保存" Clicked="OnSaveClicked" />
-    </VerticalStackLayout>
+    <ContentPage.BindingContext>
+        <vm:BridgeViewModel />
+    </ContentPage.BindingContext>
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30">
+            <Label Text="桥梁名称:" FontSize="Medium"/>
+            <Entry x:Name="nameEntry" Text="{Binding Name}" Placeholder="输入桥梁名称"/>
+
+            <Label Text="位置:" FontSize="Medium"/>
+            <Entry x:Name="locationEntry" Text="{Binding Location}" Placeholder="输入桥梁位置"/>
+
+            <Label Text="地图标识:" FontSize="Medium"/>
+            <Entry x:Name="mapIdEntry" Text="{Binding MapId}" Placeholder="输入地图标识"/>
+
+            <Button Text="保存更改" Command="{Binding EditConfirmedCommand}"  CommandParameter="{Binding}" BackgroundColor="Blue" TextColor="White"/>
+            <Button Text="取消" Command="{Binding EditCancelCommand}" BackgroundColor="Gray" TextColor="White"/>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

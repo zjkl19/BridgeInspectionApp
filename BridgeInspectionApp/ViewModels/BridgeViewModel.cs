@@ -7,12 +7,15 @@ using BridgeInspectionApp.Models;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Input;
+using BridgeInspectionApp.Views;
 
 namespace BridgeInspectionApp.ViewModels;
 
-public class BridgeViewModel : BaseViewModel
+public partial class BridgeViewModel : BaseViewModel
 {
     public ICommand DeleteBridgeCommand { get; }
+    
     private Bridge _bridge;
     private string _name;
     private string? _location;
@@ -50,10 +53,11 @@ public class BridgeViewModel : BaseViewModel
     }
 
     public ObservableCollection<DefectViewModel> Defects { get; set; }
-
-    public ICommand SaveCommand { get; private set; }
-    public ICommand DeleteCommand { get; private set; }
-
+    public ICommand EditBridgeCommand { get; }
+    public ICommand EditConfirmedCommand { get;}
+    public ICommand EditCancelCommand { get; }
+    public BridgeViewModel()
+    { }
     public BridgeViewModel(Bridge bridge)
     {
         _bridge = bridge ?? new Bridge { Defects = [] };
@@ -67,8 +71,9 @@ public class BridgeViewModel : BaseViewModel
         //    Defects.Add(new DefectViewModel(defect));
         //}
         DeleteBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteDeleteBridgeCommand(bridgeViewModel));
-        SaveCommand = new Command(async () => await SaveBridge());
-        DeleteCommand = new Command(async () => await DeleteBridge());
+        EditBridgeCommand = new RelayCommand(ExecuteEditBridgeCommand);
+        EditConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditConfirmedCommand(bridgeViewModel));
+        EditCancelCommand = new Command(async () => await ExecuteEditCancelCommand());
     }
     private async Task ExecuteDeleteBridgeCommand(BridgeViewModel bridgeViewModel)
     {
@@ -104,34 +109,40 @@ public class BridgeViewModel : BaseViewModel
             }
         }
     }
-    private async Task SaveBridge()
+
+    private void ExecuteEditBridgeCommand()
     {
-        using (var db = new BridgeContext())
+        var navigation = Application.Current.MainPage.Navigation;
+        // 假设 BridgeEditPage 是编辑桥梁的页面
+        navigation.PushAsync(new BridgeEditPage(new BridgeViewModel(_bridge)));
+    }
+    [RelayCommand]
+    private async Task ExecuteEditConfirmedCommand(BridgeViewModel bridgeViewModel)
+    {
+        using var db = new BridgeContext();
+        // 检查数据库中是否存在同名但不同 ID 的桥梁
+        var duplicateBridge = await db.Bridges
+            .FirstOrDefaultAsync(b => b.Name == bridgeViewModel.Name && b.Id != bridgeViewModel.Id);
+
+        if (duplicateBridge != null)
         {
-            var existingBridge = await db.Bridges.FindAsync(_bridge.Id);
-            if (existingBridge == null)
-            {
-                db.Bridges.Add(_bridge);
-            }
-            else
-            {
-                db.Entry(existingBridge).CurrentValues.SetValues(_bridge);
-                existingBridge.Defects = _bridge.Defects; // Ensure defects are updated if needed
-            }
+            await Application.Current.MainPage.DisplayAlert("错误", "存在同名的桥梁，请更换桥梁名称后重试。", "OK");
+            return;
+        }
+
+        var storedBridge = await db.Bridges.FindAsync(bridgeViewModel.Id);
+        if (storedBridge != null)
+        {
+            storedBridge.Name = bridgeViewModel.Name;
+            storedBridge.Location = bridgeViewModel.Location;
+            storedBridge.MapId = bridgeViewModel.MapId;
             await db.SaveChangesAsync();
+            await Application.Current.MainPage.DisplayAlert("成功", "桥梁信息已更新", "OK");
         }
     }
-
-    private async Task DeleteBridge()
+    [RelayCommand]
+    private async Task ExecuteEditCancelCommand()
     {
-        using (var db = new BridgeContext())
-        {
-            var existingBridge = await db.Bridges.FindAsync(_bridge.Id);
-            if (existingBridge != null)
-            {
-                db.Bridges.Remove(existingBridge);
-                await db.SaveChangesAsync();
-            }
-        }
+        await Application.Current.MainPage.Navigation.PopAsync();
     }
 }
