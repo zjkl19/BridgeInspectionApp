@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BridgeInspectionApp.Models;
 using System.Xml.Linq;
 using Microsoft.EntityFrameworkCore;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace BridgeInspectionApp.ViewModels;
 
@@ -98,7 +99,8 @@ public class BridgeViewModel : BaseViewModel
                 // 删除桥梁记录
                 db.Bridges.Remove(bridgeToDelete);
                 await db.SaveChangesAsync();
-
+                // 发送消息通知桥梁已删除
+                WeakReferenceMessenger.Default.Send(new Messages.BridgeDeletedMessage(Id));
             }
         }
     }

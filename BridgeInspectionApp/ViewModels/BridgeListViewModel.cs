@@ -1,5 +1,6 @@
 ﻿using BridgeInspectionApp.Data;
 using BridgeInspectionApp.Views;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,8 +22,14 @@ public class BridgeListViewModel
     public BridgeListViewModel()
     {
         Bridges = [];
-        //AddBridgeCommand = new Command(async () => await ExecuteAddBridgeCommand());
-
+        WeakReferenceMessenger.Default.Register<Messages.BridgeDeletedMessage>(this, (recipient, message) =>
+        {
+            var bridge = Bridges.FirstOrDefault(b => b.Id == message.BridgeId);
+            if (bridge != null)
+            {
+                Bridges.Remove(bridge);
+            }
+        });
         LoadBridgesCommand = new Command(async () => await LoadBridgesAsync());
         LoadBridges();
 
