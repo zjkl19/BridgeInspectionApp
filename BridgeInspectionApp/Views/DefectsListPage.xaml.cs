@@ -16,13 +16,13 @@ public partial class DefectsListPage : ContentPage
     public DefectsListPage()
     {
         InitializeComponent();
-        LoadDefects();
+        //LoadDefects();
         BindingContext = this;
     }
     public DefectsListPage(Guid bridgeId)
     {
         InitializeComponent();
-        LoadDefectsForBridge(bridgeId);
+        //LoadDefectsForBridge(bridgeId);
         BindingContext = this;
     }
     public DefectsListPage(Guid bridgeId, string bridgeName)
@@ -30,7 +30,7 @@ public partial class DefectsListPage : ContentPage
         InitializeComponent();
         BridgeId = bridgeId;
         BridgeName = bridgeName;
-        LoadDefectsForBridge(bridgeId);
+        //LoadDefectsForBridge(bridgeId);
         BindingContext = this;
     }
     protected override void OnSizeAllocated(double width, double height)
@@ -46,60 +46,60 @@ public partial class DefectsListPage : ContentPage
             defectsCollection.HeightRequest = collectionViewHeight;
         }
     }
-    private async void LoadDefectsForBridge(Guid bridgeId)
-    {
-        using var context = new BridgeContext();
-        var defects = await context.Defects
-                                   .Where(d => d.BridgeId == bridgeId)
-                                   .Include(d => d.Photos)
-                                   .ToListAsync();
-        foreach (var defect in defects)
-        {
-            Defects.Add(new DefectViewModel
-            {
-                Id = defect.Id,
-                ComponentPart = defect.ComponentPart,
-                DefectType = defect.DefectType,
-                DefectLocation = defect.DefectLocation,
-                DefectSeverity = defect.DefectSeverity,
-                Note = defect.Note,
-                Photos = new ObservableCollection<PhotoViewModel>(defect.Photos.Select(p => new PhotoViewModel
-                {
-                    Id = p.Id,
-                    FilePath = p.FilePath,
-                    Note = p.Note
-                }))
-            });
-        }
-    }
+    //private async void LoadDefectsForBridge(Guid bridgeId)
+    //{
+    //    using var context = new BridgeContext();
+    //    var defects = await context.Defects
+    //                               .Where(d => d.BridgeId == bridgeId)
+    //                               .Include(d => d.Photos)
+    //                               .ToListAsync();
+    //    foreach (var defect in defects)
+    //    {
+    //        Defects.Add(new DefectViewModel
+    //        {
+    //            Id = defect.Id,
+    //            ComponentPart = defect.ComponentPart,
+    //            DefectType = defect.DefectType,
+    //            DefectLocation = defect.DefectLocation,
+    //            DefectSeverity = defect.DefectSeverity,
+    //            Note = defect.Note,
+    //            Photos = new ObservableCollection<PhotoViewModel>(defect.Photos.Select(p => new PhotoViewModel
+    //            {
+    //                Id = p.Id,
+    //                FilePath = p.FilePath,
+    //                Note = p.Note
+    //            }))
+    //        });
+    //    }
+    //}
 
-    private async void LoadDefects()
-    {
-        //defectsCollection.ItemsSource = db.Defects.ToList();
-        using var context = new BridgeContext();
-        var defects = await context.Defects
-                                           .Include(d => d.Photos)
-                                           .ToListAsync();
+    //private async void LoadDefects()
+    //{
+    //    //defectsCollection.ItemsSource = db.Defects.ToList();
+    //    using var context = new BridgeContext();
+    //    var defects = await context.Defects
+    //                                       .Include(d => d.Photos)
+    //                                       .ToListAsync();
 
-        foreach (var defect in defects)
-        {
-            Defects.Add(new DefectViewModel
-            {
-                Id = defect.Id,
-                ComponentPart = defect.ComponentPart,
-                DefectType = defect.DefectType,
-                DefectLocation = defect.DefectLocation,
-                DefectSeverity = defect.DefectSeverity,
-                Note = defect.Note,
-                Photos = new ObservableCollection<PhotoViewModel>(defect.Photos.Select(p => new PhotoViewModel
-                {
-                    Id = p.Id,
-                    FilePath = p.FilePath,
-                    Note = p.Note
-                }))
-            });
-        }
-    }
+    //    foreach (var defect in defects)
+    //    {
+    //        Defects.Add(new DefectViewModel
+    //        {
+    //            Id = defect.Id,
+    //            ComponentPart = defect.ComponentPart,
+    //            DefectType = defect.DefectType,
+    //            DefectLocation = defect.DefectLocation,
+    //            DefectSeverity = defect.DefectSeverity,
+    //            Note = defect.Note,
+    //            Photos = new ObservableCollection<PhotoViewModel>(defect.Photos.Select(p => new PhotoViewModel
+    //            {
+    //                Id = p.Id,
+    //                FilePath = p.FilePath,
+    //                Note = p.Note
+    //            }))
+    //        });
+    //    }
+    //}
 
     private async void OnEditDefectClicked(object sender, EventArgs e)
     {

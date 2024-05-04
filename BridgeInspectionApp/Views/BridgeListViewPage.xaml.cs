@@ -1,6 +1,7 @@
 
 using BridgeInspectionApp.Data;
 using BridgeInspectionApp.Models;
+using BridgeInspectionApp.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Maui.Controls;
 using System.Linq;
@@ -8,108 +9,55 @@ namespace BridgeInspectionApp.Views;
 
 public partial class BridgeListViewPage : ContentPage
 {
+    private BridgeListViewModel _viewModel;
+
     public BridgeListViewPage()
     {
         InitializeComponent();
-        // 使用异步加载数据
-        LoadBridgesAsync();
+        _viewModel = new BridgeListViewModel();
+        BindingContext = _viewModel;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        LoadBridgesAsync(); // 重新加载桥梁数据以更新UI
+        _viewModel.LoadBridgesCommand.Execute(null); // 确保页面每次显示时都重新加载数据
     }
 
-    protected override void OnSizeAllocated(double width, double height)
-    {
-        base.OnSizeAllocated(width, height);
-        // 确保页面宽度和高度非零
-        if (width > 0 && height > 0)
-        {
-            // 根据页面的总高度减去其他元素的预估占用空间，来动态设置 CollectionView 的高度
-            double otherElementsHeight = 200; // 假设其他元素总共占用200像素高度
-            double collectionViewHeight = height - otherElementsHeight;
-
-            bridgesCollection.HeightRequest = collectionViewHeight;
-        }
-    }
-    private async Task LoadBridgesAsync()
-    {
-        try
-        {
-            using var db = new BridgeContext();
-            var bridges = await db.Bridges.ToListAsync(); // 使用异步方法加载数据
-            bridgesCollection.ItemsSource = bridges;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to load bridges: {ex.Message}");
-            await DisplayAlert("加载错误", $"无法加载桥梁数据。 {ex.Message}", "OK");
-        }
-    }
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-        var bridge = button?.BindingContext as Bridge;
-        if (bridge != null)
-        {
-            await Navigation.PushAsync(new BridgeEditPage(bridge));
-        }
+        //var button = sender as Button;
+        //var bridgeViewModel = button?.BindingContext as BridgeViewModel;
+        //if (bridgeViewModel != null)
+        //{
+        //    // 假设存在一个编辑桥梁页面，我们需要传递一个 Bridge 对象，需要从 ViewModel 中获取
+        //    await Navigation.PushAsync(new BridgeEditPage(bridgeViewModel.Bridge));
+        //}
     }
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        bool answer = await DisplayAlert("删除确认", "删除桥梁将同时删除所有相关的病害和照片。此操作不可恢复，是否继续？", "是", "否");
-        if (answer)
-        {
-            var button = sender as Button;
-            var bridge = button?.BindingContext as Bridge;
-
-            if (bridge != null)
-            {
-                using var db = new BridgeContext();
-                var bridgeToDelete = db.Bridges.Include(b => b.Defects).ThenInclude(d => d.Photos).FirstOrDefault(b => b.Id == bridge.Id);
-
-                if (bridgeToDelete != null)
-                {
-                    // 删除所有关联照片文件
-                    foreach (var defect in bridgeToDelete.Defects)
-                    {
-                        foreach (var photo in defect.Photos)
-                        {
-                            var photoPath = Path.Combine(FileSystem.AppDataDirectory, photo.FilePath);
-                            if (File.Exists(photoPath))
-                            {
-                                File.Delete(photoPath);
-                            }
-                        }
-                    }
-
-                    // 删除桥梁记录
-                    db.Bridges.Remove(bridgeToDelete);
-                    await db.SaveChangesAsync();
-
-                    // 刷新桥梁列表
-                    LoadBridgesAsync();
-                }
-            }
-        }
+        //bool answer = await DisplayAlert("删除确认", "删除桥梁将同时删除所有相关的病害和照片。此操作不可恢复，是否继续？", "是", "否");
+        //if (answer)
+        //{
+        //    var button = sender as Button;
+        //    var bridgeViewModel = button?.BindingContext as BridgeViewModel;
+        //    if (bridgeViewModel != null)
+        //    {
+        //        _viewModel.DeleteBridgeCommand.Execute(bridgeViewModel);
+        //    }
+        //}
     }
-
 
     private async void OnManageDefectsClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-        if (button != null)
-        {
-            var bridge = button.BindingContext as Bridge;
-            if (bridge != null)
-            {
-                var defectsPage = new DefectsListPage(bridge.Id, bridge.Name);
-                await Navigation.PushAsync(defectsPage);
-            }
-        }
+        //var button = sender as Button;
+        //var bridgeViewModel = button?.BindingContext as BridgeViewModel;
+        //if (bridgeViewModel != null)
+        //{
+        //    var defectsPage = new DefectsListPage(bridgeViewModel.Bridge);
+        //    await Navigation.PushAsync(defectsPage);
+        //}
     }
 }

@@ -11,7 +11,17 @@ namespace BridgeInspectionApp.ViewModels;
 public class BaseViewModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler PropertyChanged;
+    private bool _isBusy = false;
 
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            _isBusy = value;
+            OnPropertyChanged();
+        }
+    }
     // Helper method to call PropertyChanged event
     protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {

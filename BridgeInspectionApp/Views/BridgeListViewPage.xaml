@@ -9,34 +9,35 @@
         <vm:BridgeListViewModel />
     </ContentPage.BindingContext>
     <VerticalStackLayout>
-    <!-- 添加桥梁按钮 -->
+        <!-- 添加桥梁按钮 -->
         <Button Text="添加桥梁"
                 Command="{Binding AddBridgeCommand}"
                 HorizontalOptions="Center"
                 Style="{StaticResource PrimaryButton}"
                 Margin="10"/>
         <ScrollView>
-        <VerticalStackLayout>
-            <CollectionView x:Name="bridgesCollection">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame BorderColor="LightGray" Margin="10" Padding="10">
-                            <VerticalStackLayout>
-                                <Label Text="{Binding Name}" FontSize="Medium" />
-                                <Label Text="{Binding Location}" FontSize="Small" />
-
-                                <!-- 水平布局按钮 -->
-                                <HorizontalStackLayout Spacing="10">
-                                    <Button Text="编辑" BackgroundColor="Blue" Clicked="OnEditClicked" />
+            <VerticalStackLayout>
+                <CollectionView x:Name="bridgesCollection"  ItemsSource="{Binding Bridges}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BorderColor="LightGray" Margin="10" Padding="10">
+                                <VerticalStackLayout>
+                                    <Label Text="{Binding Name}" FontSize="Medium" />
+                                    <Label Text="{Binding Location}" FontSize="Small" />
+                                    <HorizontalStackLayout Spacing="10">
+                                        <!--<Button Text="编辑" BackgroundColor="Blue" Clicked="OnEditClicked" />
                                     <Button Text="删除" BackgroundColor="Red" Clicked="OnDeleteClicked" />
-                                    <Button Text="病害管理" BackgroundColor="Green" Clicked="OnManageDefectsClicked" />
-                                </HorizontalStackLayout>
-                            </VerticalStackLayout>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </VerticalStackLayout>
-    </ScrollView>
+                                    <Button Text="病害管理" BackgroundColor="Green" Clicked="OnManageDefectsClicked" />-->
+                                        <Button Text="编辑" BackgroundColor="Blue" Command="{Binding EditBridgeCommand}" />
+                                        <Button Text="删除" BackgroundColor="Red" Command="{Binding DeleteBridgeCommand}"  CommandParameter="{Binding}"/>
+                                        <Button Text="病害管理" BackgroundColor="Green" Command="{Binding ManageDefectsCommand}" />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
     </VerticalStackLayout>
 </ContentPage>
