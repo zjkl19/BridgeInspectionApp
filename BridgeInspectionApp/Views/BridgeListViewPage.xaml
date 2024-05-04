@@ -2,8 +2,20 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BridgeInspectionApp.Views.BridgeListViewPage"
+             xmlns:vm="clr-namespace:BridgeInspectionApp.ViewModels"
              Title="查看桥梁信息">
-    <ScrollView>
+    <!-- 确保为ContentPage设置了ViewModel -->
+    <ContentPage.BindingContext>
+        <vm:BridgeListViewModel />
+    </ContentPage.BindingContext>
+    <VerticalStackLayout>
+    <!-- 添加桥梁按钮 -->
+        <Button Text="添加桥梁"
+                Command="{Binding AddBridgeCommand}"
+                HorizontalOptions="Center"
+                Style="{StaticResource PrimaryButton}"
+                Margin="10"/>
+        <ScrollView>
         <VerticalStackLayout>
             <CollectionView x:Name="bridgesCollection">
                 <CollectionView.ItemTemplate>
@@ -26,4 +38,5 @@
             </CollectionView>
         </VerticalStackLayout>
     </ScrollView>
+    </VerticalStackLayout>
 </ContentPage>

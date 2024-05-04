@@ -14,10 +14,25 @@ public partial class BridgeListViewPage : ContentPage
         // 使用异步加载数据
         LoadBridgesAsync();
     }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
         LoadBridgesAsync(); // 重新加载桥梁数据以更新UI
+    }
+
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+        // 确保页面宽度和高度非零
+        if (width > 0 && height > 0)
+        {
+            // 根据页面的总高度减去其他元素的预估占用空间，来动态设置 CollectionView 的高度
+            double otherElementsHeight = 200; // 假设其他元素总共占用200像素高度
+            double collectionViewHeight = height - otherElementsHeight;
+
+            bridgesCollection.HeightRequest = collectionViewHeight;
+        }
     }
     private async Task LoadBridgesAsync()
     {

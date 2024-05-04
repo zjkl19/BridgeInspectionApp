@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.BridgeAddPage"
+             Title="添加桥梁">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="15" Padding="30">
+            <Label Text="桥梁名称:" FontSize="Medium"/>
+            <Entry x:Name="bridgeNameEntry" Placeholder="输入桥梁名称"/>
+
+            <Label Text="位置:" FontSize="Medium"/>
+            <Entry x:Name="bridgeLocationEntry" Placeholder="输入桥梁位置"/>
+
+            <Button Text="添加桥梁" Command="{Binding AddBridgeCommand}"/>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
