@@ -11,7 +11,7 @@
     <VerticalStackLayout>
         <!-- 添加桥梁按钮 -->
         <Button Text="添加桥梁"
-                Command="{Binding AddBridgeCommand}"
+                Command="{Binding BridgeAddCommand}"
                 HorizontalOptions="Center"
                 Style="{StaticResource PrimaryButton}"
                 Margin="10"/>

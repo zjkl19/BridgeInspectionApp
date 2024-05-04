@@ -1,4 +1,6 @@
-﻿using BridgeInspectionApp.Data;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using BridgeInspectionApp.Data;
 using BridgeInspectionApp.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +14,11 @@ using System.Windows.Input;
 
 namespace BridgeInspectionApp.ViewModels;
 
-public class BridgeListViewModel
+public class BridgeListViewModel : ObservableObject
 {
     public ObservableCollection<BridgeViewModel> Bridges { get; private set; }
     public ICommand LoadBridgesCommand { get; }
-    public ICommand AddBridgeCommand { get; }
+    public ICommand BridgeAddCommand { get; }
     
 
     public BridgeListViewModel()
@@ -32,6 +34,7 @@ public class BridgeListViewModel
         });
         LoadBridgesCommand = new Command(async () => await LoadBridgesAsync());
         LoadBridges();
+        BridgeAddCommand = new RelayCommand(async () => await ExecuteBridgeAddCommand());
 
     }
 
@@ -76,7 +79,7 @@ public class BridgeListViewModel
         }
 
     }
-    private async Task ExecuteAddBridgeCommand()
+    private async Task ExecuteBridgeAddCommand()
     {
         // 打开添加桥梁页面
         await Application.Current.MainPage.Navigation.PushAsync(new BridgeAddPage());

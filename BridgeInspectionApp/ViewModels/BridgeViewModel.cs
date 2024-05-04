@@ -56,8 +56,18 @@ public partial class BridgeViewModel : BaseViewModel
     public ICommand EditBridgeCommand { get; }
     public ICommand EditConfirmedCommand { get;}
     public ICommand EditCancelCommand { get; }
+
+    public ICommand AddConfirmedCommand { get; }
+    public ICommand CancelCommand { get; }
     public BridgeViewModel()
-    { }
+    {
+        DeleteBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteDeleteBridgeCommand(bridgeViewModel));
+        EditBridgeCommand = new RelayCommand(ExecuteEditBridgeCommand);
+        EditConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditConfirmedCommand(bridgeViewModel));
+        EditCancelCommand = new Command(async () => await ExecuteEditCancelCommand());
+        AddConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteAddConfirmedCommand(bridgeViewModel));
+        CancelCommand = new Command(async () => await ExecuteCancelCommand());
+    }
     public BridgeViewModel(Bridge bridge)
     {
         _bridge = bridge ?? new Bridge { Defects = [] };
@@ -74,6 +84,8 @@ public partial class BridgeViewModel : BaseViewModel
         EditBridgeCommand = new RelayCommand(ExecuteEditBridgeCommand);
         EditConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditConfirmedCommand(bridgeViewModel));
         EditCancelCommand = new Command(async () => await ExecuteEditCancelCommand());
+        AddConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteAddConfirmedCommand(bridgeViewModel));
+        CancelCommand = new Command(async () => await ExecuteCancelCommand());
     }
     private async Task ExecuteDeleteBridgeCommand(BridgeViewModel bridgeViewModel)
     {
@@ -142,6 +154,42 @@ public partial class BridgeViewModel : BaseViewModel
     }
     [RelayCommand]
     private async Task ExecuteEditCancelCommand()
+    {
+        await Application.Current.MainPage.Navigation.PopAsync();
+    }
+    [RelayCommand]
+    private async Task ExecuteAddConfirmedCommand(BridgeViewModel bridgeViewModel)
+    {
+        if (string.IsNullOrWhiteSpace(Name))
+        {
+            await Application.Current.MainPage.DisplayAlert("错误", "桥梁名称必须填写。", "确定");
+            return;
+        }
+
+        using var db = new BridgeContext();
+        // 检查是否存在重名桥梁
+        bool exists = await db.Bridges.AnyAsync(b => b.Name == Name);
+        if (exists)
+        {
+            await Application.Current.MainPage.DisplayAlert("错误", "桥梁名称已存在。请使用不同的名称。", "确定");
+            return;
+        }
+
+        // 保存新桥梁
+        var newBridge = new Bridge
+        {
+            Name = bridgeViewModel.Name,
+            Location = bridgeViewModel.Location,
+            MapId = bridgeViewModel.MapId
+        };
+        db.Bridges.Add(newBridge);
+        await db.SaveChangesAsync();
+
+        await Application.Current.MainPage.DisplayAlert("成功", "桥梁已成功添加。", "确定");
+        // 可以添加代码以关闭当前页面或更新列表
+    }
+    [RelayCommand]
+    private async Task ExecuteCancelCommand()
     {
         await Application.Current.MainPage.Navigation.PopAsync();
     }

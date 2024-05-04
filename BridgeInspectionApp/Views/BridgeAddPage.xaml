@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.BridgeAddPage"
+             xmlns:vm="clr-namespace:BridgeInspectionApp.ViewModels"
+             Title="添加桥梁">
+    <ContentPage.BindingContext>
+        <vm:BridgeViewModel />
+    </ContentPage.BindingContext>
+    <VerticalStackLayout Spacing="20" Padding="30">
+        <Entry Placeholder="桥梁名称" Text="{Binding Name}"/>
+        <Entry Placeholder="位置" Text="{Binding Location}"/>
+        <Entry Placeholder="地图标识" Text="{Binding MapId}" />
+        <Button Text="保存" Command="{Binding AddConfirmedCommand}" CommandParameter="{Binding}" BackgroundColor="Blue"  TextColor="White"/>
+        <Button Text="取消" Command="{Binding CancelCommand}" BackgroundColor="Gray" TextColor="White"/>
+    </VerticalStackLayout>
+</ContentPage>

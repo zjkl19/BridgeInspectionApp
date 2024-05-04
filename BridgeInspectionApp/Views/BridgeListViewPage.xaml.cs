@@ -24,30 +24,18 @@ public partial class BridgeListViewPage : ContentPage
         _viewModel.LoadBridgesCommand.Execute(null); // 确保页面每次显示时都重新加载数据
     }
 
-
-    private async void OnEditClicked(object sender, EventArgs e)
+    protected override void OnSizeAllocated(double width, double height)
     {
-        //var button = sender as Button;
-        //var bridgeViewModel = button?.BindingContext as BridgeViewModel;
-        //if (bridgeViewModel != null)
-        //{
-        //    // 假设存在一个编辑桥梁页面，我们需要传递一个 Bridge 对象，需要从 ViewModel 中获取
-        //    await Navigation.PushAsync(new BridgeEditPage(bridgeViewModel.Bridge));
-        //}
-    }
+        base.OnSizeAllocated(width, height);
+        // 确保页面宽度和高度非零
+        if (width > 0 && height > 0)
+        {
+            // 根据页面的总高度减去其他元素的预估占用空间，来动态设置 CollectionView 的高度
+            double otherElementsHeight = 200; // 假设其他元素总共占用200像素高度
+            double collectionViewHeight = height - otherElementsHeight;
 
-    private async void OnDeleteClicked(object sender, EventArgs e)
-    {
-        //bool answer = await DisplayAlert("删除确认", "删除桥梁将同时删除所有相关的病害和照片。此操作不可恢复，是否继续？", "是", "否");
-        //if (answer)
-        //{
-        //    var button = sender as Button;
-        //    var bridgeViewModel = button?.BindingContext as BridgeViewModel;
-        //    if (bridgeViewModel != null)
-        //    {
-        //        _viewModel.DeleteBridgeCommand.Execute(bridgeViewModel);
-        //    }
-        //}
+            bridgesCollection.HeightRequest = collectionViewHeight;
+        }
     }
 
     private async void OnManageDefectsClicked(object sender, EventArgs e)
