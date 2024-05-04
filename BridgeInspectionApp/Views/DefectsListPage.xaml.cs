@@ -2,6 +2,7 @@ using BridgeInspectionApp.Data;
 using System.Collections.ObjectModel;
 using Microsoft.EntityFrameworkCore;
 using BridgeInspectionApp.Models;
+using BridgeInspectionApp.ViewModels;
 
 
 namespace BridgeInspectionApp.Views;
@@ -132,39 +133,5 @@ public partial class DefectsListPage : ContentPage
     }
 
 
-    public class DefectViewModel
-    {
-        public Guid Id { get; set; }
-        public string ComponentPart { get; set; }
-        public string DefectType { get; set; }
-        public string DefectLocation { get; set; }
-        public string DefectSeverity { get; set; }
-        public string Note { get; set; }
-        public ObservableCollection<PhotoViewModel> Photos { get; set; }
-
-        public DefectViewModel()
-        {
-               Photos = new ObservableCollection<PhotoViewModel>();
-            // Populate Photos with paths to images
-        }
-        private void LoadPhotos(List<Photo> photos)
-        {
-            foreach (var photo in photos)
-            {
-                Photos.Add(new PhotoViewModel
-                {
-                    Id = photo.Id,
-                    FilePath = photo.FilePath,
-                    Note = photo.Note
-                });
-            }
-        }
-    }
-
-    public class PhotoViewModel
-    {
-        public Guid Id { get; set; }
-        public string FilePath { get; set; }
-        public string Note { get; set; }
-    }
+    
 }

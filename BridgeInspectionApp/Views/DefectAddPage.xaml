@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.DefectAddPage"
+             Title="添加病害">
+
+    <VerticalStackLayout Spacing="15" Padding="20">
+        <Entry x:Name="typeEntry" Placeholder="病害类型" Text="{Binding DefectType}"/>
+        <Entry x:Name="locationEntry" Placeholder="病害位置" Text="{Binding DefectLocation}"/>
+        <Entry x:Name="severityEntry" Placeholder="病害严重程度" Text="{Binding DefectSeverity}"/>
+        <Editor x:Name="notesEditor" Placeholder="备注" Text="{Binding Note}" AutoSize="TextChanges"/>
+
+        <Button Text="保存病害" Command="{Binding SaveDefectCommand}"/>
+    </VerticalStackLayout>
+</ContentPage>
