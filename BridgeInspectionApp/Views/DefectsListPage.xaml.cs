@@ -9,7 +9,7 @@ namespace BridgeInspectionApp.Views;
 
 public partial class DefectsListPage : ContentPage
 {
-    public string BridgeName { get; private set; }
+    
     public Guid BridgeId { get; private set; }
     public ObservableCollection<DefectViewModel> Defects { get; set; } = new ObservableCollection<DefectViewModel>();
 
@@ -22,9 +22,8 @@ public partial class DefectsListPage : ContentPage
     public DefectsListPage(BridgeViewModel bridgeViewModel)
     {
         InitializeComponent();
-        BindingContext = bridgeViewModel;  // 将页面的数据上下文设置为传入的 ViewModel
+        BindingContext =new DefectsListViewModel(bridgeViewModel);  
 
-        // 可以在这里添加加载病害数据的逻辑，根据 bridgeViewModel 中的信息
     }
     public DefectsListPage(Guid bridgeId)
     {
@@ -36,7 +35,7 @@ public partial class DefectsListPage : ContentPage
     {
         InitializeComponent();
         BridgeId = bridgeId;
-        BridgeName = bridgeName;
+        
         //LoadDefectsForBridge(bridgeId);
         BindingContext = this;
     }

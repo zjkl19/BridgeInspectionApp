@@ -1,5 +1,6 @@
 ﻿using BridgeInspectionApp.Data;
 using BridgeInspectionApp.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -12,23 +13,27 @@ using System.Windows.Input;
 
 namespace BridgeInspectionApp.ViewModels;
 
-public class DefectsListViewModel
+public partial class DefectsListViewModel : ObservableObject
 {
+    [ObservableProperty]
+    public string bridgeName;
     public ObservableCollection<DefectViewModel> Defects { get; set; }
     public ICommand DeleteCommand { get; private set; }
     public ICommand AddDefectCommand { get; private set; }
     public DefectsListViewModel()
     {
-        Defects = new ObservableCollection<DefectViewModel>(); // 初始化病害列表
-        AddDefectCommand = new Command(ExecuteAddDefectCommand);
+        //Defects = new ObservableCollection<DefectViewModel>(); // 初始化病害列表
+        //AddDefectCommand = new Command(ExecuteAddDefectCommand);
         //DeleteCommand = new Command<DefectViewModel>(async (defect) => await ExecuteDeleteCommand(defect));
     }
 
     public DefectsListViewModel(BridgeViewModel bridgeViewModel)
     {
-        RegisterMessages();
+        bridgeName = bridgeViewModel.Name;
         Defects = bridgeViewModel.Defects;
-        
+        RegisterMessages();
+        AddDefectCommand = new Command(ExecuteAddDefectCommand);
+
     }
     private void RegisterMessages()
     {
