@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using BridgeInspectionApp.Messages;
 namespace BridgeInspectionApp.ViewModels;
 
 public partial class DefectViewModel : ObservableObject
@@ -18,6 +19,8 @@ public partial class DefectViewModel : ObservableObject
     private Guid id;
     [ObservableProperty]
     private Guid bridgeId;
+    [ObservableProperty]
+    private string bridgeName;
     [ObservableProperty]
     private Defect defect;
     [ObservableProperty]
@@ -50,8 +53,20 @@ public partial class DefectViewModel : ObservableObject
         defectLocation = defect?.DefectLocation;
         defectSeverity = defect?.DefectSeverity;
         note = defect?.Note;
+
+        LoadBridgeName();
+
         SaveCommand = new Command(async () => await SaveDefectAsync());
         DeleteCommand = new Command<DefectViewModel>(async (viewModel) => await ExecuteDeleteCommand(viewModel));
+    }
+    private async void LoadBridgeName()
+    {
+        using var db = new BridgeContext();
+        var bridge = await db.Bridges.FindAsync(BridgeId);
+        if (bridge != null)
+        {
+            BridgeName = bridge.Name;
+        }
     }
     private async Task ExecuteDeleteCommand(DefectViewModel viewModel)
     {
@@ -115,6 +130,11 @@ public partial class DefectViewModel : ObservableObject
             db.Defects.Add(newDefect);
             await db.SaveChangesAsync();
             await Application.Current.MainPage.DisplayAlert("成功", "病害信息已保存", "OK");
+            // 发送消息通知列表页面更新
+            WeakReferenceMessenger.Default.Send(new DefectUpdatedMessage(Id));
+
+            // 返回上一页
+            await Application.Current.MainPage.Navigation.PopAsync();
         }
         catch (Exception ex)
         {
@@ -122,16 +142,4 @@ public partial class DefectViewModel : ObservableObject
         }
     }
 
-    //private async Task DeleteDefect()
-    //{
-    //    using (var db = new BridgeContext())
-    //    {
-    //        var existingDefect = await db.Defects.FindAsync(defect.Id);
-    //        if (existingDefect != null)
-    //        {
-    //            db.Defects.Remove(existingDefect);
-    //            await db.SaveChangesAsync();
-    //        }
-    //    }
-    //}
 }

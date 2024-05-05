@@ -9,7 +9,7 @@
     </ContentPage.BindingContext>
     <VerticalStackLayout>
         <!-- 显示桥梁名称 -->
-        <Label Text="{Binding BridgeViewModel.Name}" FontSize="Large" HorizontalOptions="Center" Margin="10"/>
+        <Label Text="{Binding BridgeName}" FontSize="Large" HorizontalOptions="Center" Margin="10"/>
 
         <!-- 病害信息表单 -->
         <Entry x:Name="componentPartEntry" Placeholder="构件部位" Text="{Binding ComponentPart}"/>
