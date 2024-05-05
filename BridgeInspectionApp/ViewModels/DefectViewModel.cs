@@ -7,59 +7,26 @@ using BridgeInspectionApp.Models;
 using CommunityToolkit.Mvvm;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.EntityFrameworkCore;
 namespace BridgeInspectionApp.ViewModels;
 
-public class DefectViewModel : ObservableObject
+public partial class DefectViewModel : ObservableObject
 {
-    private Defect _defect;
-    private string? _componentPart;
-    private string? _defectType;
-    private string? _defectLocation;
-    private string? _defectSeverity;
-    private string? _note;
-
-    public Guid Id
-    {
-        get => _defect.Id;
-        set
-        {
-            if (_defect.Id != value)
-            {
-                _defect.Id = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public string? ComponentPart
-    {
-        get => _componentPart;
-        set => SetProperty(ref _componentPart, value);
-    }
-
-    public string? DefectType
-    {
-        get => _defectType;
-        set => SetProperty(ref _defectType, value);
-    }
-
-    public string? DefectLocation
-    {
-        get => _defectLocation;
-        set => SetProperty(ref _defectLocation, value);
-    }
-
-    public string? DefectSeverity
-    {
-        get => _defectSeverity;
-        set => SetProperty(ref _defectSeverity, value);
-    }
-
-    public string? Note
-    {
-        get => _note;
-        set => SetProperty(ref _note, value);
-    }
+    [ObservableProperty]
+    private Guid id;
+    [ObservableProperty]
+    private Defect defect;
+    [ObservableProperty]
+    private string? componentPart;
+    [ObservableProperty]
+    private string? defectType;
+    [ObservableProperty]
+    private string? defectLocation;
+    [ObservableProperty]
+    private string? defectSeverity;
+    [ObservableProperty]
+    private string? note;
 
     public ObservableCollection<Photo> Photos { get; set; }
 
@@ -68,29 +35,62 @@ public class DefectViewModel : ObservableObject
 
     public DefectViewModel(Defect defect)
     {
-        _defect = defect ?? new Defect();
-        Photos = new ObservableCollection<Photo>(_defect.Photos ?? new List<Photo>());
-        _componentPart = defect.ComponentPart;
-        _defectType = defect.DefectType;
-        _defectLocation = defect.DefectLocation;
-        _defectSeverity = defect.DefectSeverity;
-        _note = defect.Note;
+        defect ??= new Defect();
+        Id= defect.Id;
+        Photos = new ObservableCollection<Photo>(defect.Photos ?? new List<Photo>());
+        componentPart = defect?.ComponentPart;
+        defectType = defect?.DefectType;
+        defectLocation = defect?.DefectLocation;
+        defectSeverity = defect?.DefectSeverity;
+        note = defect?.Note;
         SaveCommand = new Command(async () => await SaveDefect());
-        DeleteCommand = new Command(async () => await DeleteDefect());
+        DeleteCommand = new Command<DefectViewModel>(async (viewModel) => await ExecuteDeleteCommand(viewModel));
     }
+    private async Task ExecuteDeleteCommand(DefectViewModel viewModel)
+    {
+        bool isConfirmed = await Application.Current.MainPage.DisplayAlert(
+            "删除确认",
+            "删除病害将同时删除所有相关的照片。此操作不可恢复，是否继续？",
+            "是",
+            "否");
 
+        if (isConfirmed)
+        {
+            using var db = new BridgeContext();
+            var defectToDelete = await db.Defects.Include(d => d.Photos)
+                                                 .FirstOrDefaultAsync(d => d.Id == viewModel.Id);
+
+            if (defectToDelete != null)
+            {
+                // 删除关联的照片文件
+                foreach (var photo in defectToDelete.Photos)
+                {
+                    var photoPath = Path.Combine(FileSystem.AppDataDirectory, photo.FilePath);
+                    if (File.Exists(photoPath))
+                    {
+                        File.Delete(photoPath);
+                    }
+                }
+
+                db.Defects.Remove(defectToDelete);
+                await db.SaveChangesAsync();
+                await Application.Current.MainPage.DisplayAlert("成功", "病害及其照片已成功删除。", "OK");
+                WeakReferenceMessenger.Default.Send(new Messages.DefectDeletedMessage(Id));
+            }
+        }
+    }
     private async Task SaveDefect()
     {
         using (var db = new BridgeContext())
         {
-            var existingDefect = await db.Defects.FindAsync(_defect.Id);
+            var existingDefect = await db.Defects.FindAsync(defect.Id);
             if (existingDefect == null)
             {
-                db.Defects.Add(_defect);
+                db.Defects.Add(defect);
             }
             else
             {
-                db.Entry(existingDefect).CurrentValues.SetValues(_defect);
+                db.Entry(existingDefect).CurrentValues.SetValues(defect);
             }
             await db.SaveChangesAsync();
         }
@@ -100,7 +100,7 @@ public class DefectViewModel : ObservableObject
     {
         using (var db = new BridgeContext())
         {
-            var existingDefect = await db.Defects.FindAsync(_defect.Id);
+            var existingDefect = await db.Defects.FindAsync(defect.Id);
             if (existingDefect != null)
             {
                 db.Defects.Remove(existingDefect);

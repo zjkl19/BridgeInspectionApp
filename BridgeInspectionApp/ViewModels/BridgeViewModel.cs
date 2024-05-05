@@ -122,12 +122,9 @@ public partial class BridgeViewModel : BaseViewModel
                         }
                     }
                 }
-
-                // 删除桥梁记录
                 db.Bridges.Remove(bridgeToDelete);
                 await db.SaveChangesAsync();
-                // 发送消息通知桥梁已删除
-                WeakReferenceMessenger.Default.Send(new Messages.BridgeDeletedMessage(Id));
+                WeakReferenceMessenger.Default.Send(new Messages.BridgeDeletedMessage(Id));    // 发送消息通知桥梁已删除
             }
         }
     }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BridgeInspectionApp.Messages;
 
-public class BridgeDeletedMessage(Guid bridgeId)
+public class DefectDeletedMessage(Guid defectId)
 {
-    public Guid BridgeId { get; } = bridgeId;
+    public Guid DefectId { get; } = defectId;
 }

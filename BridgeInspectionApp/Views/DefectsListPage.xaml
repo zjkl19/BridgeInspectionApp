@@ -20,6 +20,7 @@
                         <DataTemplate>
                             <Frame BorderColor="LightGray" Margin="10" Padding="10">
                                 <VerticalStackLayout>
+                                    <!--<Label Text="{Binding Id}" FontSize="Medium" />-->
                                     <Label Text="{Binding ComponentPart}" FontSize="Medium" />
                                     <Label Text="{Binding DefectType}" FontSize="Small" />
                                     <Label Text="{Binding DefectLocation}" FontSize="Small" />
@@ -42,8 +43,8 @@
 
                                     <!-- Buttons for edit and delete -->
                                     <HorizontalStackLayout Spacing="10">
-                                        <Button Text="编辑" Command="{Binding EditCommand}" BackgroundColor="Blue" />
-                                        <Button Text="删除" Command="{Binding DeleteCommand}" BackgroundColor="Red" />
+                                        <Button Text="编辑" Command="{Binding EditCommand}" CommandParameter="{Binding}" BackgroundColor="Blue" />
+                                        <Button Text="删除" Command="{Binding DeleteCommand}" CommandParameter="{Binding}" BackgroundColor="Red" />
                                     </HorizontalStackLayout>
                                 </VerticalStackLayout>
                             </Frame>
