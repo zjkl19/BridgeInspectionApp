@@ -13,7 +13,6 @@
         <Button Text="添加桥梁"
                 Command="{Binding BridgeAddCommand}"
                 HorizontalOptions="Center"
-                Style="{StaticResource PrimaryButton}"
                 Margin="10"/>
         <ScrollView>
             <VerticalStackLayout>
