@@ -4,10 +4,12 @@ using Microsoft.Maui.Controls;
 using BridgeInspectionApp.Data;
 using System.Threading.Tasks;
 using BridgeInspectionApp.Models;
-
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 namespace BridgeInspectionApp.ViewModels;
 
-public class DefectViewModel : BaseViewModel
+public class DefectViewModel : ObservableObject
 {
     private Defect _defect;
     private string? _componentPart;

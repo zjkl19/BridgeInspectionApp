@@ -19,7 +19,7 @@ public class BridgeListViewModel : ObservableObject
     public ObservableCollection<BridgeViewModel> Bridges { get; private set; }
     public ICommand LoadBridgesCommand { get; }
     public ICommand BridgeAddCommand { get; }
-    
+
 
     public BridgeListViewModel()
     {
@@ -40,25 +40,24 @@ public class BridgeListViewModel : ObservableObject
 
     private void LoadBridges()
     {
-        // 模拟加载桥梁数据
-        // 在实际应用中，这里应该调用数据库或服务获取桥梁数据
-        using var db = new BridgeContext();
-        var bridges = db.Bridges.ToList();
-        foreach (var bridge in bridges)
+        try
         {
-            Bridges.Add(new BridgeViewModel(bridge));
+            using var db = new BridgeContext();
+            var bridges = db.Bridges
+                            .Include(b => b.Defects)
+                            .ThenInclude(d => d.Photos)
+                            .ToList(); // 确保从数据库加载所有桥梁和相关的病害及照片
+
+            Bridges.Clear(); // 清除现有集合内容，避免重复添加
+            foreach (var bridge in bridges)
+            {
+                Bridges.Add(new BridgeViewModel(bridge)); // 将加载的桥梁添加到集合中
+            }
         }
-        //try
-        //{
-        //    using var db = new BridgeContext();
-        //    var bridges = await db.Bridges.ToListAsync(); // 使用异步方法加载数据
-        //    bridgesCollection.ItemsSource = bridges;
-        //}
-        //catch (Exception ex)
-        //{
-        //    Console.WriteLine($"Failed to load bridges: {ex.Message}");
-        //    await DisplayAlert("加载错误", $"无法加载桥梁数据。 {ex.Message}", "OK");
-        //}
+        catch (Exception ex)
+        {
+            Application.Current.MainPage.DisplayAlert("错误", $"加载桥梁数据时发生错误: {ex.Message}", "确定");
+        }
     }
     private async Task LoadBridgesAsync()
     {
@@ -85,6 +84,6 @@ public class BridgeListViewModel : ObservableObject
         await Application.Current.MainPage.Navigation.PushAsync(new BridgeAddPage());
     }
 
-    
+
 
 }

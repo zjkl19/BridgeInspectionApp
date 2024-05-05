@@ -19,6 +19,13 @@ public partial class DefectsListPage : ContentPage
         //LoadDefects();
         BindingContext = this;
     }
+    public DefectsListPage(BridgeViewModel bridgeViewModel)
+    {
+        InitializeComponent();
+        BindingContext = bridgeViewModel;  // 将页面的数据上下文设置为传入的 ViewModel
+
+        // 可以在这里添加加载病害数据的逻辑，根据 bridgeViewModel 中的信息
+    }
     public DefectsListPage(Guid bridgeId)
     {
         InitializeComponent();
@@ -45,75 +52,6 @@ public partial class DefectsListPage : ContentPage
 
             defectsCollection.HeightRequest = collectionViewHeight;
         }
-    }
-    //private async void LoadDefectsForBridge(Guid bridgeId)
-    //{
-    //    using var context = new BridgeContext();
-    //    var defects = await context.Defects
-    //                               .Where(d => d.BridgeId == bridgeId)
-    //                               .Include(d => d.Photos)
-    //                               .ToListAsync();
-    //    foreach (var defect in defects)
-    //    {
-    //        Defects.Add(new DefectViewModel
-    //        {
-    //            Id = defect.Id,
-    //            ComponentPart = defect.ComponentPart,
-    //            DefectType = defect.DefectType,
-    //            DefectLocation = defect.DefectLocation,
-    //            DefectSeverity = defect.DefectSeverity,
-    //            Note = defect.Note,
-    //            Photos = new ObservableCollection<PhotoViewModel>(defect.Photos.Select(p => new PhotoViewModel
-    //            {
-    //                Id = p.Id,
-    //                FilePath = p.FilePath,
-    //                Note = p.Note
-    //            }))
-    //        });
-    //    }
-    //}
-
-    //private async void LoadDefects()
-    //{
-    //    //defectsCollection.ItemsSource = db.Defects.ToList();
-    //    using var context = new BridgeContext();
-    //    var defects = await context.Defects
-    //                                       .Include(d => d.Photos)
-    //                                       .ToListAsync();
-
-    //    foreach (var defect in defects)
-    //    {
-    //        Defects.Add(new DefectViewModel
-    //        {
-    //            Id = defect.Id,
-    //            ComponentPart = defect.ComponentPart,
-    //            DefectType = defect.DefectType,
-    //            DefectLocation = defect.DefectLocation,
-    //            DefectSeverity = defect.DefectSeverity,
-    //            Note = defect.Note,
-    //            Photos = new ObservableCollection<PhotoViewModel>(defect.Photos.Select(p => new PhotoViewModel
-    //            {
-    //                Id = p.Id,
-    //                FilePath = p.FilePath,
-    //                Note = p.Note
-    //            }))
-    //        });
-    //    }
-    //}
-
-    private async void OnEditDefectClicked(object sender, EventArgs e)
-    {
-        // 编辑病害逻辑
-    }
-
-    private async void OnDeleteDefectClicked(object sender, EventArgs e)
-    {
-        // 删除病害逻辑
-    }
-
-    private async void OnAddDefectClicked(object sender, EventArgs e)
-    {
-        // 新增病害逻辑
     }
 
     private void OnImageTapped(object sender, EventArgs e)

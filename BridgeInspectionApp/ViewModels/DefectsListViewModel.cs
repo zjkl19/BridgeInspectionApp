@@ -22,6 +22,12 @@ public class DefectsListViewModel
         AddDefectCommand = new Command(ExecuteAddDefectCommand);
         DeleteCommand = new Command<DefectViewModel>(async (defect) => await ExecuteDeleteCommand(defect));
     }
+
+    public DefectsListViewModel(BridgeViewModel bridgeViewModel)
+    {
+        Defects = bridgeViewModel.Defects;
+    }
+
     private async void ExecuteAddDefectCommand()
     {
         // 这里假设有一个用于添加病害的页面，名为 AddDefectPage

@@ -14,15 +14,14 @@ public partial class BridgeListViewPage : ContentPage
     public BridgeListViewPage()
     {
         InitializeComponent();
-        _viewModel = new BridgeListViewModel();
-        BindingContext = _viewModel;
+        BindingContext = new BridgeListViewModel();
     }
 
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        _viewModel.LoadBridgesCommand.Execute(null); // 确保页面每次显示时都重新加载数据
-    }
+    //protected override void OnAppearing()
+    //{
+    //    base.OnAppearing();
+    //    _viewModel.LoadBridgesCommand.Execute(null);
+    //}
 
     protected override void OnSizeAllocated(double width, double height)
     {
@@ -38,14 +37,4 @@ public partial class BridgeListViewPage : ContentPage
         }
     }
 
-    private async void OnManageDefectsClicked(object sender, EventArgs e)
-    {
-        //var button = sender as Button;
-        //var bridgeViewModel = button?.BindingContext as BridgeViewModel;
-        //if (bridgeViewModel != null)
-        //{
-        //    var defectsPage = new DefectsListPage(bridgeViewModel.Bridge);
-        //    await Navigation.PushAsync(defectsPage);
-        //}
-    }
 }

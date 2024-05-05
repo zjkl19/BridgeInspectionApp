@@ -53,6 +53,7 @@ public partial class BridgeViewModel : BaseViewModel
     }
 
     public ObservableCollection<DefectViewModel> Defects { get; set; }
+    public ICommand ManageDefectsCommand { get; }
     public ICommand EditBridgeCommand { get; }
     public ICommand EditConfirmedCommand { get;}
     public ICommand EditCancelCommand { get; }
@@ -61,6 +62,7 @@ public partial class BridgeViewModel : BaseViewModel
     public ICommand CancelCommand { get; }
     public BridgeViewModel()
     {
+        ManageDefectsCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteManageDefectsCommand(bridgeViewModel));
         DeleteBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteDeleteBridgeCommand(bridgeViewModel));
         EditBridgeCommand = new RelayCommand(ExecuteEditBridgeCommand);
         EditConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditConfirmedCommand(bridgeViewModel));
@@ -75,17 +77,25 @@ public partial class BridgeViewModel : BaseViewModel
         _location = bridge.Location;
         _mapId = bridge.MapId;
 
-        //Defects = [];
-        //foreach (var defect in bridge.Defects)
-        //{
-        //    Defects.Add(new DefectViewModel(defect));
-        //}
+        Defects = [];
+        foreach (var defect in bridge.Defects)
+        {
+            Defects.Add(new DefectViewModel(defect));
+        }
+        ManageDefectsCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteManageDefectsCommand(bridgeViewModel));
         DeleteBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteDeleteBridgeCommand(bridgeViewModel));
         EditBridgeCommand = new RelayCommand(ExecuteEditBridgeCommand);
         EditConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditConfirmedCommand(bridgeViewModel));
         EditCancelCommand = new Command(async () => await ExecuteEditCancelCommand());
         AddConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteAddConfirmedCommand(bridgeViewModel));
         CancelCommand = new Command(async () => await ExecuteCancelCommand());
+    }
+
+    [RelayCommand]
+    private async Task ExecuteManageDefectsCommand(BridgeViewModel bridgeViewModel)
+    {
+        var defectsPage = new DefectsListPage(bridgeViewModel);
+        await Application.Current.MainPage.Navigation.PushAsync(defectsPage);
     }
     private async Task ExecuteDeleteBridgeCommand(BridgeViewModel bridgeViewModel)
     {
