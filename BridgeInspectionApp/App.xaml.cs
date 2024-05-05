@@ -32,7 +32,7 @@ public partial class App : Application
         }, TaskScheduler.FromCurrentSynchronizationContext());  // 确保在主线程上更新UI
         PhotoService.GenerateTestPhotos();
         using var db = new BridgeContext();
-        
+
         db.Database.EnsureDeleted();  // 确保删除旧数据库
         db.Database.EnsureCreated();  // 创建新数据库
         SeedDatabase(db);  // 填充测试数据
@@ -67,129 +67,147 @@ public partial class App : Application
     {
         try
         {
-            if (!db.Bridges.Any())
+            if (db.Bridges.Any())
             {
-                // 第一座桥梁 - 武汉长江大桥
-                var bridge1 = new Bridge
-                {
-                    Name = "武汉长江大桥",
-                    Location = "武汉"
-                };
-                // 第一个病害 - 裂缝
-                var defect1 = new Defect
-                {
-                    ComponentPart = "主梁",
-                    DefectType = "裂缝",
-                    DefectLocation = "中部",
-                    DefectSeverity = "中等",
-                    Note = "裂缝长度约1米，需观察。",
-                    BridgeId = bridge1.Id
-                };
-
-                var photo1 = new Photo
-                {
-                    FilePath = CreateTextPhoto(Path.Combine(FileSystem.AppDataDirectory, "武汉长江大桥裂缝.jpg"), "大桥裂缝"),
-                    Note = "裂缝照片",
-                    DefectId = defect1.Id
-                };
-
-                defect1.Photos = [photo1];
-
-                // 第二个病害 - 锈蚀
-                var defect2 = new Defect
-                {
-                    ComponentPart = "承重结构",
-                    DefectType = "锈蚀",
-                    DefectLocation = "桥底",
-                    DefectSeverity = "轻微",
-                    Note = "检测到初期锈蚀，建议密切关注。",
-                    BridgeId = bridge1.Id
-                };
-
-                var photo2 = new Photo
-                {
-                    FilePath = CreateTextPhoto(Path.Combine(FileSystem.AppDataDirectory, "武汉长江大桥锈蚀.jpg"), "初期锈蚀"),
-                    Note = "锈蚀照片",
-                    DefectId = defect2.Id
-                };
-
-                defect2.Photos = [photo2];
-
-                bridge1.Defects = [defect1, defect2];
-                // 第二座桥梁 - 南京长江大桥
-                var bridge2 = new Bridge
-                {
-                    Name = "南京长江大桥",
-                    Location = "南京"
-                };
-
-                var defect3 = new Defect
-                {
-                    ComponentPart = "支柱",
-                    DefectType = "腐蚀",
-                    DefectLocation = "基座",
-                    DefectSeverity = "重度",
-                    Note = "严重腐蚀，可能影响结构安全。",
-                    BridgeId = bridge2.Id
-                };
-
-                var photo3 = new Photo
-                {
-                    FilePath = CreateTextPhoto(Path.Combine(FileSystem.AppDataDirectory, "南京长江大桥腐蚀.jpg"), "支柱腐蚀"),
-                    Note = "支柱腐蚀照片",
-                    DefectId = defect3.Id
-                };
-                defect3.Photos = [photo3];
-                // 第二个病害 - 裂缝
-                var defect4 = new Defect
-                {
-                    ComponentPart = "路面",
-                    DefectType = "裂缝",
-                    DefectLocation = "接缝处",
-                    DefectSeverity = "轻度",
-                    Note = "路面接缝处出现裂缝，需要修补。",
-                    BridgeId = bridge2.Id
-                };
-
-                var photo4 = new Photo
-                {
-                    FilePath = CreateTextPhoto(Path.Combine(FileSystem.AppDataDirectory, "南京长江大桥路面裂缝1.jpg"), "路面裂缝"),
-                    Note = "路面裂缝照片",
-                    DefectId = defect4.Id
-                };
-                var photo5 = new Photo
-                {
-                    FilePath = CreateTextPhoto(Path.Combine(FileSystem.AppDataDirectory, "南京长江大桥路面裂缝2.jpg"), "路裂缝2"),
-                    Note = "路面裂缝照片",
-                    DefectId = defect4.Id
-                };
-                defect4.Photos = [photo4, photo5];
-
-                // 第3个病害 - 裂缝
-                var defect5 = new Defect
-                {
-                    ComponentPart = "路面3",
-                    DefectType = "裂缝",
-                    DefectLocation = "接缝处",
-                    DefectSeverity = "轻度",
-                    Note = "路面接缝处出现裂缝，需要修补。",
-                    BridgeId = bridge2.Id
-                };
-
-                bridge2.Defects = [defect3, defect4, defect5];
-
-                db.Bridges.Add(bridge1);
-                db.Bridges.Add(bridge2);
-                db.SaveChanges();
+                return; // 如果数据库已有数据，则不执行初始化
             }
+
+            // 初始化数据
+            List<Bridge> bridges = InitializeBridgesData();
+
+            // 添加到数据库
+            db.Bridges.AddRange(bridges);
+            db.SaveChanges();
         }
         catch (Exception ex)
         {
-            // Handle exceptions
-            throw;
+            // 更详细的异常处理
+            Console.WriteLine($"Error seeding database: {ex.Message}");
+            throw; // 或处理异常，决定是否重新抛出
         }
     }
 
+    private List<Bridge> InitializeBridgesData()
+    {
+        // 创建武汉长江大桥和南京长江大桥的数据
+        var bridge1 = new Bridge
+        {
+            Name = "武汉长江大桥",
+            Location = "武汉",
+            Defects = new List<Defect>
+        {
+            new Defect
+            {
+                ComponentPart = "主梁",
+                DefectType = "裂缝",
+                DefectLocation = "中部",
+                DefectSeverity = "中等",
+                Note = "裂缝长度约1米，需观察。",
+                Photos = new List<Photo>
+                {
+                    new Photo
+                    {
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("武汉长江大桥裂缝.jpg"), "大桥裂缝"),
+                        Note = "裂缝照片"
+                    }
+                }
+            },
+            new Defect
+            {
+                ComponentPart = "承重结构",
+                DefectType = "锈蚀",
+                DefectLocation = "桥底",
+                DefectSeverity = "轻微",
+                Note = "检测到初期锈蚀，建议密切关注。",
+                Photos = new List<Photo>
+                {
+                    new Photo
+                    {
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("武汉长江大桥锈蚀.jpg"), "初期锈蚀"),
+                        Note = "锈蚀照片"
+                    }
+                }
+            }
+        }
+        };
+
+        var bridge2 = new Bridge
+        {
+            Name = "南京长江大桥",
+            Location = "南京",
+            Defects = new List<Defect>
+        {
+            new Defect
+            {
+                ComponentPart = "支柱",
+                DefectType = "腐蚀",
+                DefectLocation = "基座",
+                DefectSeverity = "重度",
+                Note = "严重腐蚀，可能影响结构安全。",
+                Photos = new List<Photo>
+                {
+                    new Photo
+                    {
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("南京长江大桥腐蚀.jpg"), "支柱腐蚀"),
+                        Note = "支柱腐蚀照片"
+                    }
+                }
+            },
+            new Defect
+            {
+                ComponentPart = "路面",
+                DefectType = "裂缝",
+                DefectLocation = "接缝处",
+                DefectSeverity = "轻度",
+                Note = "路面接缝处出现裂缝，需要修补。",
+                Photos = new List<Photo>
+                {
+                    new Photo
+                    {
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("南京长江大桥路面裂缝1.jpg"), "路面裂缝"),
+                        Note = "路面裂缝照片1"
+                    },
+                    new Photo
+                    {
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("南京长江大桥路面裂缝2.jpg"), "路裂缝2"),
+                        Note = "路面裂缝照片2"
+                    }
+                }
+            },
+            new Defect
+            {
+                ComponentPart = "路面3",
+                DefectType = "裂缝",
+                DefectLocation = "接缝处",
+                DefectSeverity = "轻度",
+                Note = "路面接缝处出现裂缝，需要修补。",
+            }
+        }
+        };
+
+        return new List<Bridge> { bridge1, bridge2 };
+    }
+    public string CreatePublicPhotoPath(string filename)
+    {
+        string folderPath;
+
+        if (DeviceInfo.Platform == DevicePlatform.Android)
+        {
+            folderPath = Path.Combine(FileSystem.AppDataDirectory, "Photos");
+        }
+        else if (DeviceInfo.Platform == DevicePlatform.iOS)
+        {
+            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            folderPath = Path.Combine(documents, "Photos");
+        }
+        else
+        {
+            folderPath = Path.Combine(FileSystem.AppDataDirectory, "Photos");
+        }
+
+        Directory.CreateDirectory(folderPath); // 确保文件夹存在
+        return Path.Combine(folderPath, filename);
+    }
     private string CreateTestPhoto(string filePath)
     {
         // Check if file already exists to avoid overwriting
