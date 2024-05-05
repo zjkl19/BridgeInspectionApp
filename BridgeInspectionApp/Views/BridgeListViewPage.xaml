@@ -4,12 +4,10 @@
              x:Class="BridgeInspectionApp.Views.BridgeListViewPage"
              xmlns:vm="clr-namespace:BridgeInspectionApp.ViewModels"
              Title="查看桥梁信息">
-    <!-- 确保为ContentPage设置了ViewModel -->
     <ContentPage.BindingContext>
         <vm:BridgeListViewModel />
     </ContentPage.BindingContext>
     <VerticalStackLayout>
-        <!-- 添加桥梁按钮 -->
         <Button Text="添加桥梁"
                 Command="{Binding BridgeAddCommand}"
                 HorizontalOptions="Center"

@@ -20,7 +20,6 @@ public class BridgeListViewModel : ObservableObject
     public ICommand LoadBridgesCommand { get; }
     public ICommand BridgeAddCommand { get; }
 
-
     public BridgeListViewModel()
     {
         Bridges = [];
@@ -81,7 +80,7 @@ public class BridgeListViewModel : ObservableObject
     private async Task ExecuteBridgeAddCommand()
     {
         // 打开添加桥梁页面
-        await Application.Current.MainPage.Navigation.PushAsync(new BridgeAddPage());
+        await Application.Current.MainPage.Navigation.PushAsync(new BridgeAddPage ());
     }
 
 

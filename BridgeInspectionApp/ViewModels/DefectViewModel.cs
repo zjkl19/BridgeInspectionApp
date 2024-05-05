@@ -9,12 +9,15 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 namespace BridgeInspectionApp.ViewModels;
 
 public partial class DefectViewModel : ObservableObject
 {
     [ObservableProperty]
     private Guid id;
+    [ObservableProperty]
+    private Guid bridgeId;
     [ObservableProperty]
     private Defect defect;
     [ObservableProperty]
@@ -32,18 +35,22 @@ public partial class DefectViewModel : ObservableObject
 
     public ICommand SaveCommand { get; private set; }
     public ICommand DeleteCommand { get; private set; }
-
+    public DefectViewModel()
+    {
+        SaveCommand = new Command(async () => await SaveDefectAsync());
+    }
     public DefectViewModel(Defect defect)
     {
         defect ??= new Defect();
-        Id= defect.Id;
+        Id = defect.Id;
+        BridgeId = defect.BridgeId;
         Photos = new ObservableCollection<Photo>(defect.Photos ?? new List<Photo>());
         componentPart = defect?.ComponentPart;
         defectType = defect?.DefectType;
         defectLocation = defect?.DefectLocation;
         defectSeverity = defect?.DefectSeverity;
         note = defect?.Note;
-        SaveCommand = new Command(async () => await SaveDefect());
+        SaveCommand = new Command(async () => await SaveDefectAsync());
         DeleteCommand = new Command<DefectViewModel>(async (viewModel) => await ExecuteDeleteCommand(viewModel));
     }
     private async Task ExecuteDeleteCommand(DefectViewModel viewModel)
@@ -79,33 +86,52 @@ public partial class DefectViewModel : ObservableObject
             }
         }
     }
-    private async Task SaveDefect()
+    private async Task SaveDefectAsync()
     {
-        using (var db = new BridgeContext())
+        try
         {
-            var existingDefect = await db.Defects.FindAsync(defect.Id);
-            if (existingDefect == null)
+            using var db = new BridgeContext();
+            var newDefect = new Defect
             {
-                db.Defects.Add(defect);
-            }
-            else
+                BridgeId = BridgeId, // 确保病害关联到正确的桥梁
+                ComponentPart = ComponentPart,
+                DefectType = DefectType,
+                DefectLocation = DefectLocation,
+                DefectSeverity = DefectSeverity,
+                Note = Note,
+                Photos = new List<Photo>() // 初始化照片列表
+            };
+
+            // 假设你已有照片处理逻辑
+            foreach (var photo in Photos)
             {
-                db.Entry(existingDefect).CurrentValues.SetValues(defect);
+                newDefect.Photos.Add(new Photo
+                {
+                    FilePath = photo.FilePath, // 或者是上传后的文件路径
+                    Note = photo.Note
+                });
             }
+
+            db.Defects.Add(newDefect);
             await db.SaveChangesAsync();
+            await Application.Current.MainPage.DisplayAlert("成功", "病害信息已保存", "OK");
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("错误", $"保存病害出错: {ex.Message}", "OK");
         }
     }
 
-    private async Task DeleteDefect()
-    {
-        using (var db = new BridgeContext())
-        {
-            var existingDefect = await db.Defects.FindAsync(defect.Id);
-            if (existingDefect != null)
-            {
-                db.Defects.Remove(existingDefect);
-                await db.SaveChangesAsync();
-            }
-        }
-    }
+    //private async Task DeleteDefect()
+    //{
+    //    using (var db = new BridgeContext())
+    //    {
+    //        var existingDefect = await db.Defects.FindAsync(defect.Id);
+    //        if (existingDefect != null)
+    //        {
+    //            db.Defects.Remove(existingDefect);
+    //            await db.SaveChangesAsync();
+    //        }
+    //    }
+    //}
 }

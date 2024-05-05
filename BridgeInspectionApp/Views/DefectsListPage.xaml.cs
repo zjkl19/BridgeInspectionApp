@@ -15,30 +15,14 @@ public partial class DefectsListPage : ContentPage
 
     public DefectsListPage()
     {
-        InitializeComponent();
-        //LoadDefects();
-        BindingContext = this;
+
     }
     public DefectsListPage(BridgeViewModel bridgeViewModel)
     {
         InitializeComponent();
         BindingContext =new DefectsListViewModel(bridgeViewModel);  
+    }
 
-    }
-    public DefectsListPage(Guid bridgeId)
-    {
-        InitializeComponent();
-        //LoadDefectsForBridge(bridgeId);
-        BindingContext = this;
-    }
-    public DefectsListPage(Guid bridgeId, string bridgeName)
-    {
-        InitializeComponent();
-        BridgeId = bridgeId;
-        
-        //LoadDefectsForBridge(bridgeId);
-        BindingContext = this;
-    }
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);

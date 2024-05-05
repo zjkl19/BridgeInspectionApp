@@ -17,23 +17,22 @@ public partial class DefectsListViewModel : ObservableObject
 {
     [ObservableProperty]
     public string bridgeName;
+    private BridgeViewModel _bridgeViewModel;
     public ObservableCollection<DefectViewModel> Defects { get; set; }
     public ICommand DeleteCommand { get; private set; }
     public ICommand AddDefectCommand { get; private set; }
     public DefectsListViewModel()
     {
-        //Defects = new ObservableCollection<DefectViewModel>(); // 初始化病害列表
-        //AddDefectCommand = new Command(ExecuteAddDefectCommand);
-        //DeleteCommand = new Command<DefectViewModel>(async (defect) => await ExecuteDeleteCommand(defect));
+
     }
 
     public DefectsListViewModel(BridgeViewModel bridgeViewModel)
     {
         bridgeName = bridgeViewModel.Name;
+        _bridgeViewModel= bridgeViewModel;
         Defects = bridgeViewModel.Defects;
         RegisterMessages();
-        AddDefectCommand = new Command(ExecuteAddDefectCommand);
-
+        AddDefectCommand = new Command(async () => await ExecuteAddDefectCommand());
     }
     private void RegisterMessages()
     {
@@ -49,10 +48,10 @@ public partial class DefectsListViewModel : ObservableObject
 
     }
 
-    private async void ExecuteAddDefectCommand()
+    private async Task ExecuteAddDefectCommand()
     {
-        // 这里假设有一个用于添加病害的页面，名为 AddDefectPage
-        await Application.Current.MainPage.Navigation.PushAsync(new DefectAddPage());
+        var defectAddPage = new DefectAddPage(new DefectViewModel(new Models.Defect { BridgeId=_bridgeViewModel.Id }), _bridgeViewModel);
+        await Application.Current.MainPage.Navigation.PushAsync(defectAddPage);
     }
     //private async Task ExecuteDeleteCommand(DefectViewModel defectViewModel)
     //{

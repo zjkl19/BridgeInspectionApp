@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.DefectAddPage"
+             xmlns:vm="clr-namespace:BridgeInspectionApp.ViewModels"
+             Title="新增病害">
+    <ContentPage.BindingContext>
+        <vm:DefectViewModel />
+    </ContentPage.BindingContext>
+    <VerticalStackLayout>
+        <!-- 显示桥梁名称 -->
+        <Label Text="{Binding BridgeViewModel.Name}" FontSize="Large" HorizontalOptions="Center" Margin="10"/>
+
+        <!-- 病害信息表单 -->
+        <Entry x:Name="componentPartEntry" Placeholder="构件部位" Text="{Binding ComponentPart}"/>
+        <Entry x:Name="defectTypeEntry" Placeholder="病害类型" Text="{Binding DefectType}"/>
+        <Entry x:Name="defectLocationEntry" Placeholder="位置" Text="{Binding DefectLocation}"/>
+        <Entry x:Name="defectSeverityEntry" Placeholder="严重程度" Text="{Binding DefectSeverity}"/>
+        <Entry x:Name="noteEntry" Placeholder="备注" Text="{Binding Note}"/>
+
+        <!-- 上传照片区域 -->
+        <!-- 此部分将在后续版本中实现 -->
+
+        <!-- 确认添加按钮 -->
+        <Button Text="确认添加" Command="{Binding SaveCommand}" HorizontalOptions="Center"/>
+    </VerticalStackLayout>
+</ContentPage>
