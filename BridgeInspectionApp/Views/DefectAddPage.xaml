@@ -19,9 +19,23 @@
         <Entry x:Name="noteEntry" Placeholder="备注" Text="{Binding Note}"/>
 
         <!-- 上传照片区域 -->
-        <!-- 此部分将在后续版本中实现 -->
-
-        <!-- 确认添加按钮 -->
-        <Button Text="确认添加" Command="{Binding SaveCommand}" HorizontalOptions="Center"/>
+        <CollectionView ItemsSource="{Binding Photos}" HeightRequest="350">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="10" HorizontalItemSpacing="10"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5" Padding="0" BorderColor="LightGray">
+                        <Image Source="{Binding FilePath}" HeightRequest="200" Aspect="AspectFit" />
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <!-- 操作按钮 -->
+        <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="20" Margin="0,20,0,0">
+            <Button Text="从相册选择" Command="{Binding PickPhotoCommand}" BackgroundColor="#007ACC" TextColor="White"/>
+            <Button Text="拍照" Command="{Binding TakePhotoCommand}" BackgroundColor="#f77f00" TextColor="White"/>
+            <Button Text="确认添加" Command="{Binding SaveCommand}" BackgroundColor="#4CAF50" TextColor="White"/>
+        </StackLayout>
     </VerticalStackLayout>
 </ContentPage>

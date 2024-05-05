@@ -34,8 +34,9 @@ public partial class DefectViewModel : ObservableObject
     [ObservableProperty]
     private string? note;
 
-    public ObservableCollection<Photo> Photos { get; set; }
-
+    public ObservableCollection<PhotoViewModel> Photos { get; } = new ObservableCollection<PhotoViewModel>();
+    public ICommand PickPhotoCommand { get; }
+    public ICommand TakePhotoCommand { get; }
     public ICommand SaveCommand { get; private set; }
     public ICommand DeleteCommand { get; private set; }
     public DefectViewModel()
@@ -47,17 +48,63 @@ public partial class DefectViewModel : ObservableObject
         defect ??= new Defect();
         Id = defect.Id;
         BridgeId = defect.BridgeId;
-        Photos = new ObservableCollection<Photo>(defect.Photos ?? new List<Photo>());
+        //Photos = new ObservableCollection<PhotoViewModel>(defect.Photos ?? new List<Photo>());
         componentPart = defect?.ComponentPart;
         defectType = defect?.DefectType;
         defectLocation = defect?.DefectLocation;
         defectSeverity = defect?.DefectSeverity;
         note = defect?.Note;
 
+        // 转换 Photo 到 PhotoViewModel 并填充 Photos 集合
+        Photos = new ObservableCollection<PhotoViewModel>();
+        if (defect.Photos != null)
+        {
+            foreach (var photo in defect.Photos)
+            {
+                Photos.Add(new PhotoViewModel(photo.FilePath, photo.Note));
+            }
+        }
+
         LoadBridgeName();
 
         SaveCommand = new Command(async () => await SaveDefectAsync());
         DeleteCommand = new Command<DefectViewModel>(async (viewModel) => await ExecuteDeleteCommand(viewModel));
+
+        PickPhotoCommand = new Command(async () => await PickPhotoAsync());
+        TakePhotoCommand = new Command(async () => await TakePhotoAsync());
+    }
+    private async Task PickPhotoAsync()
+    {
+        // 使用 MediaPicker 选择图片
+        var fileResult = await MediaPicker.PickPhotoAsync();
+        if (fileResult != null)
+        {
+            var filePath = await LoadPhotoAsync(fileResult);
+            Photos.Add(new PhotoViewModel(filePath));
+        }
+    }
+
+    private async Task TakePhotoAsync()
+    {
+        // 使用 MediaPicker 拍照
+        var fileResult = await MediaPicker.CapturePhotoAsync();
+        if (fileResult != null)
+        {
+            var filePath = await LoadPhotoAsync(fileResult);
+            Photos.Add(new PhotoViewModel(filePath));
+        }
+    }
+
+    private async Task<string> LoadPhotoAsync(FileResult photo)
+    {
+        // 存储拍摄的照片到适当位置并返回文件路径
+        var newFile = Path.Combine(FileSystem.AppDataDirectory, photo.FileName);
+        using (var stream = await photo.OpenReadAsync())
+        using (var newStream = File.OpenWrite(newFile))
+        {
+            await stream.CopyToAsync(newStream);
+        }
+        return newFile;
     }
     private async void LoadBridgeName()
     {
