@@ -23,6 +23,7 @@ public partial class DefectsListViewModel : ObservableObject
     public ObservableCollection<DefectViewModel> Defects { get; set; }
     public ICommand DeleteCommand { get; private set; }
     public ICommand AddDefectCommand { get; private set; }
+    public ICommand NavigateToFullScreenCommand { get; }
     public DefectsListViewModel()
     {
 
@@ -33,6 +34,13 @@ public partial class DefectsListViewModel : ObservableObject
         bridgeName = bridgeViewModel.Name;
         _bridgeViewModel= bridgeViewModel;
         Defects = bridgeViewModel.Defects;
+
+        NavigateToFullScreenCommand = new Command<string>(async (filePath) =>
+        {
+            var page = new ImageFullScreenPage(filePath);
+            await Application.Current.MainPage.Navigation.PushAsync(page);
+        });
+
         RegisterMessages();
         AddDefectCommand = new Command(async () => await ExecuteAddDefectCommand());
     }
@@ -51,6 +59,7 @@ public partial class DefectsListViewModel : ObservableObject
         {
             LoadDefects();  
         });
+
 
     }
     private void LoadDefects()

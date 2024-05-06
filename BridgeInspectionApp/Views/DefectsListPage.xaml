@@ -33,7 +33,13 @@
                                             <DataTemplate>
                                                 <Frame Padding="5" Margin="5">
                                                     <StackLayout>
-                                                        <Image Source="{Binding FilePath}" HeightRequest="100" WidthRequest="100" Aspect="AspectFill"/>
+                                                        <Image Source="{Binding FilePath}" HeightRequest="100" WidthRequest="100" Aspect="AspectFill">
+                                                            <Image.GestureRecognizers>
+                                                                <TapGestureRecognizer
+                        Command="{Binding BindingContext.NavigateToFullScreenCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                        CommandParameter="{Binding FilePath}"/>
+                                                            </Image.GestureRecognizers>
+                                                        </Image>
                                                         <!--<Label Text="{Binding Note}" FontSize="Small"/>-->
                                                     </StackLayout>
                                                 </Frame>
