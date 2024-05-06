@@ -150,12 +150,17 @@ public partial class DefectViewModel : ObservableObject
     }
     private async Task SaveDefectAsync()
     {
+        if (string.IsNullOrWhiteSpace(ComponentPart))
+        {
+            await Application.Current.MainPage.DisplayAlert("错误", "请填写构件部位", "OK");
+            return; // 终止操作
+        }
         try
         {
             using var db = new BridgeContext();
             var newDefect = new Defect
             {
-                BridgeId = BridgeId, // 确保病害关联到正确的桥梁
+                BridgeId = BridgeId, 
                 ComponentPart = ComponentPart,
                 DefectType = DefectType,
                 DefectLocation = DefectLocation,
@@ -164,18 +169,13 @@ public partial class DefectViewModel : ObservableObject
                 Photos = new List<Photo>() // 初始化照片列表
             };
 
-            // 假设你已有照片处理逻辑
-            foreach (var photo in Photos)
-            {
-                newDefect.Photos.Add(new Photo
-                {
-                    FilePath = photo.FilePath, // 或者是上传后的文件路径
-                    Note = photo.Note
-                });
-            }
-
             db.Defects.Add(newDefect);
             await db.SaveChangesAsync();
+            // 保存照片文件并更新数据库
+            await SavePhotoFilesAsync(db,newDefect);
+            
+
+
             await Application.Current.MainPage.DisplayAlert("成功", "病害信息已保存", "OK");
             // 发送消息通知列表页面更新
             WeakReferenceMessenger.Default.Send(new DefectUpdatedMessage(Id));
@@ -188,5 +188,54 @@ public partial class DefectViewModel : ObservableObject
             await Application.Current.MainPage.DisplayAlert("错误", $"保存病害出错: {ex.Message}", "OK");
         }
     }
+    private async Task SavePhotoFilesAsync(BridgeContext db,Defect newDefect)
+    {
+        foreach (var photoViewModel in Photos)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(photoViewModel.FilePath))
+                {
+                    // 假设 FilePath 是临时存储路径
+                    var targetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "MyAppPhotos", Path.GetFileName(photoViewModel.FilePath));
+
+                    // 确保目标目录存在
+                    var directory = Path.GetDirectoryName(targetPath);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+                    // 检查文件是否已存在
+                    if (File.Exists(targetPath))
+                    {
+                        bool overwrite = await Application.Current.MainPage.DisplayAlert("覆盖文件", $"文件 {Path.GetFileName(photoViewModel.FilePath)} 已存在。是否覆盖？", "是", "否");
+                        if (!overwrite)
+                        {
+                            continue; // 跳过此文件
+                        }
+                    }
+
+                    // 尝试将文件从临时位置移动到目标位置
+                    File.Move(photoViewModel.FilePath, targetPath, overwrite: true);
+                    var newPhoto = new Photo
+                    {
+                        FilePath = targetPath,
+                        Note = photoViewModel.Note,
+                        DefectId = newDefect.Id
+                    };
+                    db.Photos.Add(newPhoto);  // 确保新照片被添加到数据库上下文中
+                    await db.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                // 日志或处理文件操作中的异常，这样即使有照片处理失败，也不会影响其他照片的保存
+                Console.WriteLine($"Error processing photo {photoViewModel.FilePath}: {ex.Message}");
+                // 可以选择在这里通知用户某个特定的照片保存失败
+                await Application.Current.MainPage.DisplayAlert("照片保存错误", $"无法保存照片 {Path.GetFileName(photoViewModel.FilePath)}: {ex.Message}", "OK");
+            }
+        }
+    }
+
 
 }
