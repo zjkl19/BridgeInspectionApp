@@ -26,8 +26,23 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Frame Margin="5" Padding="0" BorderColor="LightGray">
-                        <Image Source="{Binding FilePath}" HeightRequest="200" Aspect="AspectFit" />
+                        <Grid>
+                            <Image Source="{Binding FilePath}" HeightRequest="200" Aspect="AspectFit" />
+                            <Button
+                                Text="X"
+                                FontAttributes="Bold"
+                                FontSize="Small"
+                                WidthRequest="50"
+                                HeightRequest="50"
+                                HorizontalOptions="End"
+                                VerticalOptions="Start"
+                                BackgroundColor="Transparent"
+                                TextColor="Red"
+                                Command="{Binding BindingContext.RemovePhotoCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                CommandParameter="{Binding .}"/>
+                        </Grid>
                     </Frame>
+
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

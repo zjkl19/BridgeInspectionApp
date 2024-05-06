@@ -37,6 +37,7 @@ public partial class DefectViewModel : ObservableObject
     public ObservableCollection<PhotoViewModel> Photos { get; } = new ObservableCollection<PhotoViewModel>();
     public ICommand PickPhotoCommand { get; }
     public ICommand TakePhotoCommand { get; }
+    public ICommand RemovePhotoCommand { get; }
     public ICommand SaveCommand { get; private set; }
     public ICommand DeleteCommand { get; private set; }
     public DefectViewModel()
@@ -72,6 +73,8 @@ public partial class DefectViewModel : ObservableObject
 
         PickPhotoCommand = new Command(async () => await PickPhotoAsync());
         TakePhotoCommand = new Command(async () => await TakePhotoAsync());
+        RemovePhotoCommand = new Command<PhotoViewModel>(RemovePhoto);
+
     }
     private async Task PickPhotoAsync()
     {
@@ -94,7 +97,13 @@ public partial class DefectViewModel : ObservableObject
             Photos.Add(new PhotoViewModel(filePath));
         }
     }
-
+    private void RemovePhoto(PhotoViewModel photoViewModel)
+    {
+        if (photoViewModel != null)
+        {
+            Photos.Remove(photoViewModel);
+        }
+    }
     private async Task<string> LoadPhotoAsync(FileResult photo)
     {
         // 存储拍摄的照片到适当位置并返回文件路径
