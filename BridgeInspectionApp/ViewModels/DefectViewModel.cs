@@ -11,6 +11,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using BridgeInspectionApp.Messages;
+using BridgeInspectionApp.Views;
 namespace BridgeInspectionApp.ViewModels;
 
 public partial class DefectViewModel : ObservableObject
@@ -38,11 +39,14 @@ public partial class DefectViewModel : ObservableObject
     public ICommand PickPhotoCommand { get; }
     public ICommand TakePhotoCommand { get; }
     public ICommand RemovePhotoCommand { get; }
+    public ICommand NavigateToFullScreenCommand { get; }
     public ICommand SaveCommand { get; private set; }
     public ICommand DeleteCommand { get; private set; }
+
     public DefectViewModel()
     {
         SaveCommand = new Command(async () => await SaveDefectAsync());
+
     }
     public DefectViewModel(Defect defect)
     {
@@ -74,6 +78,25 @@ public partial class DefectViewModel : ObservableObject
         PickPhotoCommand = new Command(async () => await PickPhotoAsync());
         TakePhotoCommand = new Command(async () => await TakePhotoAsync());
         RemovePhotoCommand = new Command<PhotoViewModel>(RemovePhoto);
+
+        //NavigateToFullScreenCommand = new Command<string>(async (filePath) =>
+        //{
+        //    await Shell.Current.GoToAsync($"{nameof(ImageFullScreenPage)}?ImagePath={filePath}");
+        //});
+        //NavigateToFullScreenCommand = new Command<string>(async (filePath) =>
+        //{
+        //    await Shell.Current.GoToAsync(nameof(ImageFullScreenPage), true, new Dictionary<string, object>
+        //{
+        //    { "ImagePath", filePath }
+        //});
+        //});
+
+        NavigateToFullScreenCommand = new Command<string>(async (filePath) =>
+        {
+            var page = new ImageFullScreenPage(filePath);
+            await Application.Current.MainPage.Navigation.PushAsync(page);
+        });
+
 
     }
     private async Task PickPhotoAsync()
@@ -169,7 +192,7 @@ public partial class DefectViewModel : ObservableObject
             using var db = new BridgeContext();
             var newDefect = new Defect
             {
-                BridgeId = BridgeId, 
+                BridgeId = BridgeId,
                 ComponentPart = ComponentPart,
                 DefectType = DefectType,
                 DefectLocation = DefectLocation,
@@ -181,8 +204,8 @@ public partial class DefectViewModel : ObservableObject
             db.Defects.Add(newDefect);
             await db.SaveChangesAsync();
             // 保存照片文件并更新数据库
-            await SavePhotoFilesAsync(db,newDefect);
-            
+            await SavePhotoFilesAsync(db, newDefect);
+
 
 
             await Application.Current.MainPage.DisplayAlert("成功", "病害信息已保存", "OK");
@@ -197,7 +220,7 @@ public partial class DefectViewModel : ObservableObject
             await Application.Current.MainPage.DisplayAlert("错误", $"保存病害出错: {ex.Message}", "OK");
         }
     }
-    private async Task SavePhotoFilesAsync(BridgeContext db,Defect newDefect)
+    private async Task SavePhotoFilesAsync(BridgeContext db, Defect newDefect)
     {
         foreach (var photoViewModel in Photos)
         {

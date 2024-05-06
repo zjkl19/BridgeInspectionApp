@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BridgeInspectionApp.Views.DefectAddPage"
              xmlns:vm="clr-namespace:BridgeInspectionApp.ViewModels"
+             xmlns:local="clr-namespace:BridgeInspectionApp.Views"
              Title="新增病害">
     <ContentPage.BindingContext>
         <vm:DefectViewModel />
@@ -27,8 +28,14 @@
                 <DataTemplate>
                     <Frame Margin="5" Padding="0" BorderColor="LightGray">
                         <Grid>
-                            <Image Source="{Binding FilePath}" HeightRequest="200" Aspect="AspectFit" />
-                            <Button
+                            <Image Source="{Binding FilePath}" HeightRequest="200" Aspect="AspectFit" >
+                                <Image.GestureRecognizers>
+                                            <TapGestureRecognizer
+                        Command="{Binding BindingContext.NavigateToFullScreenCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                        CommandParameter="{Binding FilePath}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                                <Button
                                 Text="X"
                                 FontAttributes="Bold"
                                 FontSize="Small"
