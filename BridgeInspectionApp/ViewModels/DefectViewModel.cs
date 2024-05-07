@@ -206,8 +206,6 @@ public partial class DefectViewModel : ObservableObject
             // 保存照片文件并更新数据库
             await SavePhotoFilesAsync(db, newDefect);
 
-
-
             await Application.Current.MainPage.DisplayAlert("成功", "病害信息已保存", "OK");
             // 发送消息通知列表页面更新
             WeakReferenceMessenger.Default.Send(new DefectUpdatedMessage(Id));
@@ -229,8 +227,8 @@ public partial class DefectViewModel : ObservableObject
                 if (!string.IsNullOrEmpty(photoViewModel.FilePath))
                 {
                     // 假设 FilePath 是临时存储路径
-                    var targetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "MyAppPhotos", Path.GetFileName(photoViewModel.FilePath));
-
+                    //var targetPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "MyAppPhotos", Path.GetFileName(photoViewModel.FilePath));
+                    var targetPath = GetPhotoFilePath();
                     // 确保目标目录存在
                     var directory = Path.GetDirectoryName(targetPath);
                     if (!Directory.Exists(directory))
@@ -269,5 +267,47 @@ public partial class DefectViewModel : ObservableObject
         }
     }
 
+    private string GeneratePhotoFileName(string timestamp)
+    {
+        // 创建基于时间的文件名
+        string fileName = $"IMG_{timestamp}.jpg";
 
+        return fileName;
+    }
+
+    private string GetPhotoFilePath()
+    {
+        string folderName = "桥梁巡查"; // 应用的名称，用于创建子文件夹
+        string folderPath;
+
+        if (DeviceInfo.Platform == DevicePlatform.Android)
+        {
+            folderPath = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures).AbsolutePath, folderName);
+        }
+        else if (DeviceInfo.Platform == DevicePlatform.iOS)
+        {
+            folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), folderName);
+        }
+        else
+        {
+            throw new NotSupportedException("Platform not supported");
+        }
+
+        // 获取当前时间并转化为字符串（ISO 8601 格式）
+        string timestamp = DateTime.Now.ToString("yyyyMMddTHHmmssfff");  // 加上毫秒确保唯一性
+
+        // 生成文件名
+        string newFileName = GeneratePhotoFileName(timestamp);
+        string fullPath = Path.Combine(folderPath, newFileName);
+
+        // 检查文件是否已存在，如果存在则添加后缀
+        int counter = 1;
+        while (File.Exists(fullPath))
+        {
+            newFileName = $"IMG_{timestamp}_{counter++}.jpg";
+            fullPath = Path.Combine(folderPath, newFileName);
+        }
+
+        return fullPath;
+    }
 }
