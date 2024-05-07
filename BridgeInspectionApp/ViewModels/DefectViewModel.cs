@@ -40,6 +40,8 @@ public partial class DefectViewModel : ObservableObject
     public ICommand TakePhotoCommand { get; }
     public ICommand RemovePhotoCommand { get; }
     public ICommand NavigateToFullScreenCommand { get; }
+    public ICommand EditCommand { get; }
+    public ICommand EditConfirmedCommand { get; }
     public ICommand SaveCommand { get; private set; }
     public ICommand DeleteCommand { get; private set; }
 
@@ -72,6 +74,8 @@ public partial class DefectViewModel : ObservableObject
 
         LoadBridgeName();
 
+        EditCommand = new Command(async () => await EditDefectAsync());
+        UpdateCommandCommand = new Command(async () => await UpdateDefectAsync());
         SaveCommand = new Command(async () => await SaveDefectAsync());
         DeleteCommand = new Command<DefectViewModel>(async (viewModel) => await ExecuteDeleteCommand(viewModel));
 
@@ -178,6 +182,48 @@ public partial class DefectViewModel : ObservableObject
                 await Application.Current.MainPage.DisplayAlert("成功", "病害及其照片已成功删除。", "OK");
                 WeakReferenceMessenger.Default.Send(new Messages.DefectDeletedMessage(Id));
             }
+        }
+    }
+
+    private async Task EditDefectAsync()
+    {
+        // 为编辑创建并导航到 DefectEditPage，同时传递当前 ViewModel
+        await Application.Current.MainPage.Navigation.PushAsync(new DefectEditPage(this));
+    }
+    private async Task UpdateDefectAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ComponentPart))
+        {
+            await Application.Current.MainPage.DisplayAlert("错误", "请填写构件部位", "OK");
+            return; // 终止操作
+        }
+        try
+        {
+            using var db = new BridgeContext();
+            var defectToUpdate = await db.Defects.FindAsync(Id);
+            if (defectToUpdate != null)
+            {
+                defectToUpdate.ComponentPart = ComponentPart;
+                defectToUpdate.DefectType = DefectType;
+                defectToUpdate.DefectLocation = DefectLocation;
+                defectToUpdate.DefectSeverity = DefectSeverity;
+                defectToUpdate.Note = Note;
+
+                // 更新照片列表，假设已经处理好了照片的添加和删除
+                db.Update(defectToUpdate);
+                await db.SaveChangesAsync();
+
+                await Application.Current.MainPage.DisplayAlert("成功", "病害信息已更新", "OK");
+                // 发送消息通知列表页面更新
+                WeakReferenceMessenger.Default.Send(new DefectUpdatedMessage(Id));
+
+                // 返回上一页
+                await Application.Current.MainPage.Navigation.PopAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            await Application.Current.MainPage.DisplayAlert("错误", $"更新病害出错: {ex.Message}", "OK");
         }
     }
     private async Task SaveDefectAsync()

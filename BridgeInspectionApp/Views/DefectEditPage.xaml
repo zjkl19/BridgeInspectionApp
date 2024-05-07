@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BridgeInspectionApp.Views.DefectEditPage"
+             xmlns:vm="clr-namespace:BridgeInspectionApp.ViewModels"
+             xmlns:local="clr-namespace:BridgeInspectionApp.Views"
+             Title="编辑病害">
+    <ContentPage.BindingContext>
+        <vm:DefectViewModel />
+    </ContentPage.BindingContext>
+    <VerticalStackLayout>
+        <!-- 显示桥梁名称 -->
+        <Label Text="{Binding BridgeName}" FontSize="Large" HorizontalOptions="Center" Margin="10"/>
+
+        <!-- 病害信息表单 -->
+        <Entry x:Name="componentPartEntry" Placeholder="构件部位" Text="{Binding ComponentPart}"/>
+        <Entry x:Name="defectTypeEntry" Placeholder="病害类型" Text="{Binding DefectType}"/>
+        <Entry x:Name="defectLocationEntry" Placeholder="位置" Text="{Binding DefectLocation}"/>
+        <Entry x:Name="defectSeverityEntry" Placeholder="严重程度" Text="{Binding DefectSeverity}"/>
+        <Entry x:Name="noteEntry" Placeholder="备注" Text="{Binding Note}"/>
+
+        <!-- 上传照片区域 -->
+        <CollectionView ItemsSource="{Binding Photos}" HeightRequest="350">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="10" HorizontalItemSpacing="10"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="5" Padding="0" BorderColor="LightGray">
+                        <Grid>
+                            <Image Source="{Binding FilePath}" HeightRequest="200" Aspect="AspectFit" >
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer
+                        Command="{Binding BindingContext.NavigateToFullScreenCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                        CommandParameter="{Binding FilePath}"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+                            <Button
+                                Text="X"
+                                FontAttributes="Bold"
+                                FontSize="Small"
+                                WidthRequest="50"
+                                HeightRequest="50"
+                                HorizontalOptions="End"
+                                VerticalOptions="Start"
+                                BackgroundColor="Transparent"
+                                TextColor="Red"
+                                Command="{Binding BindingContext.RemovePhotoCommand, Source={RelativeSource AncestorType={x:Type ContentPage}}}"
+                                CommandParameter="{Binding .}"/>
+                        </Grid>
+                    </Frame>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <!-- 操作按钮 -->
+        <StackLayout Orientation="Horizontal" HorizontalOptions="Center" Spacing="20" Margin="0,20,0,0">
+            <Button Text="从相册选择" Command="{Binding PickPhotoCommand}" BackgroundColor="#007ACC" TextColor="White"/>
+            <Button Text="拍照" Command="{Binding TakePhotoCommand}" BackgroundColor="#f77f00" TextColor="White"/>
+            <Button Text="更新" Command="{Binding UpdateCommand}" BackgroundColor="#4CAF50" TextColor="White"/>
+        </StackLayout>
+    </VerticalStackLayout>
+</ContentPage>
