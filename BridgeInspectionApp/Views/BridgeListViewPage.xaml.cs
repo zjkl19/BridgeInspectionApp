@@ -23,6 +23,11 @@ public partial class BridgeListViewPage : ContentPage
     //    _viewModel.LoadBridgesCommand.Execute(null);
     //}
 
+    private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+    {
+        var viewModel = BindingContext as BridgeListViewModel;
+        viewModel?.FilterBridges(e.NewTextValue);
+    }
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);

@@ -14,9 +14,10 @@ using System.Windows.Input;
 
 namespace BridgeInspectionApp.ViewModels;
 
-public class BridgeListViewModel : ObservableObject
+public partial class BridgeListViewModel : ObservableObject
 {
-    public ObservableCollection<BridgeViewModel> Bridges { get; private set; }
+    [ObservableProperty]
+    public ObservableCollection<BridgeViewModel> bridges;
     public ICommand LoadBridgesCommand { get; }
     public ICommand BridgeAddCommand { get; }
 
@@ -36,7 +37,20 @@ public class BridgeListViewModel : ObservableObject
         BridgeAddCommand = new RelayCommand(async () => await ExecuteBridgeAddCommand());
 
     }
-
+    public void FilterBridges(string searchText)
+    {
+        if (string.IsNullOrEmpty(searchText))
+        {
+            // 如果搜索文本为空，显示所有桥梁
+            Bridges = new ObservableCollection<BridgeViewModel>(Bridges);
+        }
+        else
+        {
+            // 否则，只显示名称包含搜索文本的桥梁
+            Bridges = new ObservableCollection<BridgeViewModel>(Bridges.Where(b => b.Name.Contains(searchText)));
+        }
+        //OnPropertyChanged(nameof(Bridges)); // 通知 UI Bridges 属性已经改变
+    }
     private void LoadBridges()
     {
         try

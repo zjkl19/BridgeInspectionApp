@@ -41,7 +41,7 @@ public partial class DefectViewModel : ObservableObject
     public ICommand RemovePhotoCommand { get; }
     public ICommand NavigateToFullScreenCommand { get; }
     public ICommand EditCommand { get; }
-    public ICommand EditConfirmedCommand { get; }
+    public ICommand UpdateCommand { get; }
     public ICommand SaveCommand { get; private set; }
     public ICommand DeleteCommand { get; private set; }
 
@@ -75,7 +75,7 @@ public partial class DefectViewModel : ObservableObject
         LoadBridgeName();
 
         EditCommand = new Command(async () => await EditDefectAsync());
-        UpdateCommandCommand = new Command(async () => await UpdateDefectAsync());
+        UpdateCommand = new Command(async () => await UpdateDefectAsync());
         SaveCommand = new Command(async () => await SaveDefectAsync());
         DeleteCommand = new Command<DefectViewModel>(async (viewModel) => await ExecuteDeleteCommand(viewModel));
 
@@ -210,6 +210,7 @@ public partial class DefectViewModel : ObservableObject
                 defectToUpdate.Note = Note;
 
                 // 更新照片列表，假设已经处理好了照片的添加和删除
+
                 db.Update(defectToUpdate);
                 await db.SaveChangesAsync();
 
