@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BridgeInspectionApp", "BridgeInspectionApp\BridgeInspectionApp.csproj", "{641E0BEF-4472-4036-B9A5-55BDDC23692A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BridgeInspectionApp.Tests", "BridgeInspectionApp.Tests\BridgeInspectionApp.Tests.csproj", "{AD9DEE2D-6A8B-4E0B-9B9C-19BBB8C36D10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{641E0BEF-4472-4036-B9A5-55BDDC23692A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{641E0BEF-4472-4036-B9A5-55BDDC23692A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{641E0BEF-4472-4036-B9A5-55BDDC23692A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{AD9DEE2D-6A8B-4E0B-9B9C-19BBB8C36D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD9DEE2D-6A8B-4E0B-9B9C-19BBB8C36D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD9DEE2D-6A8B-4E0B-9B9C-19BBB8C36D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD9DEE2D-6A8B-4E0B-9B9C-19BBB8C36D10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

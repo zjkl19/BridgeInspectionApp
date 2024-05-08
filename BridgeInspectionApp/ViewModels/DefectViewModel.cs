@@ -37,7 +37,8 @@ public partial class DefectViewModel : ObservableObject
     private string? note;
 
     private List<Photo> originalPhotos;
-    public ObservableCollection<PhotoViewModel> Photos { get; } = new ObservableCollection<PhotoViewModel>();
+    [ObservableProperty]
+    public ObservableCollection<PhotoViewModel> photos ;
     public ICommand PickPhotoCommand { get; }
     public ICommand TakePhotoCommand { get; }
     public ICommand RemovePhotoCommand { get; }
@@ -241,6 +242,9 @@ public partial class DefectViewModel : ObservableObject
 
     public async Task UpdatePhotoList(Defect defectToUpdate, BridgeContext db)
     {
+        // 从数据库重新加载原始照片列表，以确保数据的完整性
+        var originalPhotos = await db.Photos.Where(p => p.DefectId == defectToUpdate.Id).ToListAsync();
+
         var currentPhotoPaths = Photos.Select(p => p.FilePath).ToList();
         var originalPhotoPaths = originalPhotos.Select(p => p.FilePath).ToList();
 
