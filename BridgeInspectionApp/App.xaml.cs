@@ -2,6 +2,7 @@
 using BridgeInspectionApp.Models;
 using BridgeInspectionApp.Services;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 using System.Threading.Tasks;
 
 namespace BridgeInspectionApp;
@@ -89,6 +90,7 @@ public partial class App : Application
 
     private List<Bridge> InitializeBridgesData()
     {
+        string timestamp = DateTime.Now.ToString("yyyyMMddTHHmmssfff");  // 加上毫秒确保唯一性
         // 创建武汉长江大桥和南京长江大桥的数据
         var bridge1 = new Bridge
         {
@@ -107,7 +109,7 @@ public partial class App : Application
                 {
                     new Photo
                     {
-                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("武汉长江大桥裂缝.jpg"), "大桥裂缝"),
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath(timestamp), "大桥裂缝"),
                         Note = "裂缝照片"
                     }
                 }
@@ -123,7 +125,7 @@ public partial class App : Application
                 {
                     new Photo
                     {
-                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("武汉长江大桥锈蚀.jpg"), "初期锈蚀"),
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath(timestamp), "初期锈蚀"),
                         Note = "锈蚀照片"
                     }
                 }
@@ -148,7 +150,7 @@ public partial class App : Application
                 {
                     new Photo
                     {
-                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("南京长江大桥腐蚀.jpg"), "支柱腐蚀"),
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath(timestamp),"腐蚀"),
                         Note = "支柱腐蚀照片"
                     }
                 }
@@ -164,12 +166,12 @@ public partial class App : Application
                 {
                     new Photo
                     {
-                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("南京长江大桥路面裂缝1.jpg"), "路面裂缝"),
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath(timestamp),"l1"),
                         Note = "路面裂缝照片1"
                     },
                     new Photo
                     {
-                        FilePath = CreateTextPhoto(CreatePublicPhotoPath("南京长江大桥路面裂缝2.jpg"), "路裂缝2"),
+                        FilePath = CreateTextPhoto(CreatePublicPhotoPath(timestamp),"l2"),
                         Note = "路面裂缝照片2"
                     }
                 }
@@ -189,25 +191,48 @@ public partial class App : Application
     }
     public string CreatePublicPhotoPath(string filename)
     {
+        string folderName = "桥梁巡查"; // 应用的名称，用于创建子文件夹
         string folderPath;
 
         if (DeviceInfo.Platform == DevicePlatform.Android)
         {
-            folderPath = Path.Combine(FileSystem.AppDataDirectory, "Photos");
+            folderPath = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures).AbsolutePath, folderName);
         }
         else if (DeviceInfo.Platform == DevicePlatform.iOS)
         {
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            folderPath = Path.Combine(documents, "Photos");
+            folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), folderName);
         }
         else
         {
-            folderPath = Path.Combine(FileSystem.AppDataDirectory, "Photos");
+            throw new NotSupportedException("Platform not supported");
         }
 
-        Directory.CreateDirectory(folderPath); // 确保文件夹存在
-        return Path.Combine(folderPath, filename);
+        // 获取当前时间并转化为字符串（ISO 8601 格式）
+        string timestamp = DateTime.Now.ToString("yyyyMMddTHHmmssfff");  // 加上毫秒确保唯一性
+
+        // 生成文件名
+        string newFileName = SetPhotoFileName(timestamp);
+        string fullPath = Path.Combine(folderPath, newFileName);
+
+        // 检查文件是否已存在，如果存在则添加后缀
+        int counter = 1;
+        while (File.Exists(fullPath))
+        {
+            newFileName = $"IMG_{timestamp}_{counter++}.jpg";
+            fullPath = Path.Combine(folderPath, newFileName);
+        }
+
+        return fullPath;
     }
+
+    private string SetPhotoFileName(string timestamp)
+    {
+        // 创建基于时间的文件名
+        string fileName = $"IMG_{timestamp}.jpg";
+
+        return fileName;
+    }
+
     private string CreateTestPhoto(string filePath)
     {
         // Check if file already exists to avoid overwriting

@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using BridgeInspectionApp.Messages;
 using BridgeInspectionApp.Views;
+
 namespace BridgeInspectionApp.ViewModels;
 
 public partial class DefectViewModel : ObservableObject
@@ -35,6 +36,7 @@ public partial class DefectViewModel : ObservableObject
     [ObservableProperty]
     private string? note;
 
+    private List<Photo> originalPhotos;
     public ObservableCollection<PhotoViewModel> Photos { get; } = new ObservableCollection<PhotoViewModel>();
     public ICommand PickPhotoCommand { get; }
     public ICommand TakePhotoCommand { get; }
@@ -74,7 +76,7 @@ public partial class DefectViewModel : ObservableObject
 
         LoadBridgeName();
 
-        EditCommand = new Command(async () => await EditDefectAsync());
+        EditCommand = new Command<DefectViewModel>(async (viewModel) => await EditDefectAsync(viewModel));
         UpdateCommand = new Command(async () => await UpdateDefectAsync());
         SaveCommand = new Command(async () => await SaveDefectAsync());
         DeleteCommand = new Command<DefectViewModel>(async (viewModel) => await ExecuteDeleteCommand(viewModel));
@@ -185,22 +187,31 @@ public partial class DefectViewModel : ObservableObject
         }
     }
 
-    private async Task EditDefectAsync()
+    private async Task EditDefectAsync(DefectViewModel viewModel)
     {
         // 为编辑创建并导航到 DefectEditPage，同时传递当前 ViewModel
+        // 初始化 originalPhotos
+        originalPhotos = new List<Photo>(viewModel.Photos.Select(pvm => new Photo
+        {
+            FilePath = pvm.FilePath,
+            Note = pvm.Note,
+            DefectId=pvm.DefectId
+        }).ToList());
         await Application.Current.MainPage.Navigation.PushAsync(new DefectEditPage(this));
     }
+    //删除照片，保存时报错
+    //放大照片，退出时报错
     private async Task UpdateDefectAsync()
     {
         if (string.IsNullOrWhiteSpace(ComponentPart))
         {
             await Application.Current.MainPage.DisplayAlert("错误", "请填写构件部位", "OK");
-            return; // 终止操作
+            return;
         }
         try
         {
             using var db = new BridgeContext();
-            var defectToUpdate = await db.Defects.FindAsync(Id);
+            var defectToUpdate = await db.Defects.Include(d => d.Photos).FirstOrDefaultAsync(d => d.Id == Id);
             if (defectToUpdate != null)
             {
                 defectToUpdate.ComponentPart = ComponentPart;
@@ -209,16 +220,16 @@ public partial class DefectViewModel : ObservableObject
                 defectToUpdate.DefectSeverity = DefectSeverity;
                 defectToUpdate.Note = Note;
 
-                // 更新照片列表，假设已经处理好了照片的添加和删除
+
 
                 db.Update(defectToUpdate);
                 await db.SaveChangesAsync();
 
-                await Application.Current.MainPage.DisplayAlert("成功", "病害信息已更新", "OK");
-                // 发送消息通知列表页面更新
-                WeakReferenceMessenger.Default.Send(new DefectUpdatedMessage(Id));
+                // 处理照片列表更新
+                UpdatePhotoList(defectToUpdate, db);
 
-                // 返回上一页
+                await Application.Current.MainPage.DisplayAlert("成功", "病害信息已更新", "OK");
+                WeakReferenceMessenger.Default.Send(new DefectUpdatedMessage(Id));
                 await Application.Current.MainPage.Navigation.PopAsync();
             }
         }
@@ -227,6 +238,41 @@ public partial class DefectViewModel : ObservableObject
             await Application.Current.MainPage.DisplayAlert("错误", $"更新病害出错: {ex.Message}", "OK");
         }
     }
+
+    public async Task UpdatePhotoList(Defect defectToUpdate, BridgeContext db)
+    {
+        var currentPhotoPaths = Photos.Select(p => p.FilePath).ToList();
+        var originalPhotoPaths = originalPhotos.Select(p => p.FilePath).ToList();
+
+        // 确定删除的照片
+        foreach (var photo in originalPhotos.Where(p => !currentPhotoPaths.Contains(p.FilePath)))
+        {
+            File.Delete(photo.FilePath);
+            db.Photos.Remove(photo);
+        }
+
+        // 确定新添加的照片
+        foreach (var photoVM in Photos.Where(p => !originalPhotoPaths.Contains(p.FilePath)))
+        {
+            string finalPath = GetPhotoFilePath(); // 从 GetPhotoFilePath 获取最终存储路径
+
+            if (!File.Exists(finalPath))
+            {
+                File.Copy(photoVM.FilePath, finalPath); // 将文件从临时位置复制到目标位置
+            }
+
+            var newPhoto = new Photo
+            {
+                FilePath = photoVM.FilePath,
+                Note = photoVM.Note,
+                DefectId = defectToUpdate.Id
+            };
+            db.Photos.Add(newPhoto);
+
+        }
+        await db.SaveChangesAsync();
+    }
+
     private async Task SaveDefectAsync()
     {
         if (string.IsNullOrWhiteSpace(ComponentPart))
