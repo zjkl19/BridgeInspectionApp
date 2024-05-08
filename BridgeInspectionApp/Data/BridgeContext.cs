@@ -7,6 +7,12 @@ public class BridgeContext : DbContext
     public DbSet<Bridge> Bridges { get; set; }
     public DbSet<Defect> Defects { get; set; }
     public DbSet<Photo> Photos { get; set; }
+    public BridgeContext()
+    {
+    }
+    public BridgeContext(DbContextOptions<BridgeContext> options) : base(options)
+    {
+    }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
        

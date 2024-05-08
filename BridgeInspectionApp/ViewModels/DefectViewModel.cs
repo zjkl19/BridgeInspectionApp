@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using BridgeInspectionApp.Messages;
 using BridgeInspectionApp.Views;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 
 namespace BridgeInspectionApp.ViewModels;
 
@@ -375,7 +376,7 @@ public partial class DefectViewModel : ObservableObject
     private string GetPhotoFilePath()
     {
         string folderName = "桥梁巡查"; // 应用的名称，用于创建子文件夹
-        string folderPath;
+        string folderPath = string.Empty;
 
         if (DeviceInfo.Platform == DevicePlatform.Android)
         {

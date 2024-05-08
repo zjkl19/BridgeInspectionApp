@@ -4,7 +4,6 @@ using BridgeInspectionApp.Services;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.PlatformConfiguration;
 using System.Threading.Tasks;
-
 namespace BridgeInspectionApp;
 
 public partial class App : Application
@@ -64,7 +63,7 @@ public partial class App : Application
                 Current.MainPage.DisplayAlert("权限拒绝", "无法访问存储。", "确定"));
         }
     }
-    private void SeedDatabase(BridgeContext db)
+    public void SeedDatabase(BridgeContext db)
     {
         try
         {
@@ -192,11 +191,14 @@ public partial class App : Application
     public string CreatePublicPhotoPath(string filename)
     {
         string folderName = "桥梁巡查"; // 应用的名称，用于创建子文件夹
-        string folderPath;
+        string folderPath=string.Empty;
+
+        //var docsDirectory = Android.App.Application.Context.GetExternalFilesDir(Android.OS.Environment.DirectoryPictures).AbsolutePath;
 
         if (DeviceInfo.Platform == DevicePlatform.Android)
         {
             folderPath = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures).AbsolutePath, folderName);
+
         }
         else if (DeviceInfo.Platform == DevicePlatform.iOS)
         {
@@ -206,12 +208,24 @@ public partial class App : Application
         {
             throw new NotSupportedException("Platform not supported");
         }
+        //if (DeviceInfo.Platform == DevicePlatform.Android)
+        //{
+        //    folderPath = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures).AbsolutePath, folderName);
 
+        //}
+        //else if (DeviceInfo.Platform == DevicePlatform.iOS)
+        //{
+        //    folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), folderName);
+        //}
+        //else
+        //{
+        //    throw new NotSupportedException("Platform not supported");
+        //}
         // 获取当前时间并转化为字符串（ISO 8601 格式）
         string timestamp = DateTime.Now.ToString("yyyyMMddTHHmmssfff");  // 加上毫秒确保唯一性
 
         // 生成文件名
-        string newFileName = SetPhotoFileName(timestamp);
+        string newFileName = App.SetPhotoFileName(timestamp);
         string fullPath = Path.Combine(folderPath, newFileName);
 
         // 检查文件是否已存在，如果存在则添加后缀
@@ -225,7 +239,7 @@ public partial class App : Application
         return fullPath;
     }
 
-    private string SetPhotoFileName(string timestamp)
+    public static string SetPhotoFileName(string timestamp)
     {
         // 创建基于时间的文件名
         string fileName = $"IMG_{timestamp}.jpg";

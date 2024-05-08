@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BridgeInspectionApp", "BridgeInspectionApp\BridgeInspectionApp.csproj", "{641E0BEF-4472-4036-B9A5-55BDDC23692A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BridgeInspectionApp.Tests", "BridgeInspectionApp.Tests\BridgeInspectionApp.Tests.csproj", "{AD9DEE2D-6A8B-4E0B-9B9C-19BBB8C36D10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BridgeInspectionApp.Tests", "BridgeInspectionApp.Tests\BridgeInspectionApp.Tests.csproj", "{AD9DEE2D-6A8B-4E0B-9B9C-19BBB8C36D10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
