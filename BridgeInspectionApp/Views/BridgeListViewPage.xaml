@@ -8,7 +8,9 @@
         <vm:BridgeListViewModel />
     </ContentPage.BindingContext>
     <VerticalStackLayout>
+        
         <SearchBar x:Name="searchBar" Placeholder="搜索桥梁名称" TextChanged="OnSearchBarTextChanged" />
+        
         <Button Text="添加桥梁"
                 Command="{Binding BridgeAddCommand}"
                 HorizontalOptions="Center"

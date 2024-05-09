@@ -10,6 +10,9 @@
     <VerticalStackLayout>
         <!-- 显示桥梁名称 -->
         <Label Text="{Binding BridgeName}" FontSize="Large" HorizontalOptions="Center" Margin="10"/>
+
+        <SearchBar Text="{Binding FilterText}" Placeholder="关键词过滤" />
+        
         <!-- 新增病害按钮 -->
         <Button Text="新增病害" Command="{Binding AddDefectCommand}" HorizontalOptions="Center"/>
 

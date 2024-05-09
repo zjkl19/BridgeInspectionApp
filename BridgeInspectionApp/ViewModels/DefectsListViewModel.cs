@@ -19,8 +19,21 @@ public partial class DefectsListViewModel : ObservableObject
 {
     [ObservableProperty]
     public string bridgeName;
+    private string _filterText;
+    public string FilterText
+    {
+        get { return _filterText; }
+        set
+        {
+            _filterText = value;
+            OnPropertyChanged();
+            FilterDefects();
+        }
+    }
+
     private BridgeViewModel _bridgeViewModel;
-    public ObservableCollection<DefectViewModel> Defects { get; set; }
+    [ObservableProperty]
+    public ObservableCollection<DefectViewModel> defects;
     public ICommand DeleteCommand { get; private set; }
     public ICommand AddDefectCommand { get; private set; }
     public ICommand NavigateToFullScreenCommand { get; }
@@ -82,6 +95,33 @@ public partial class DefectsListViewModel : ObservableObject
         {
             Debug.WriteLine($"Failed to load defects: {ex.Message}");
             Application.Current.MainPage.DisplayAlert("加载错误", "无法加载病害数据。", "OK");
+        }
+    }
+
+    // 添加新的方法
+    public void FilterDefects()
+    {
+        using var db = new BridgeContext();
+        var defects = db.Defects
+                        .Include(d => d.Photos) // 加载照片
+                                                // 其他需要加载的字段...
+                        .Where(d => d.BridgeId == _bridgeViewModel.Id) // 只加载当前桥梁的缺陷
+                        .ToList();
+        var allDefects = defects.Select(d => new DefectViewModel(d)).ToList();
+        if (string.IsNullOrEmpty(FilterText))
+        {
+            // 如果搜索文本为空，显示所有缺陷
+            Defects = new ObservableCollection<DefectViewModel>(allDefects);
+        }
+        else
+        {
+            // 否则，只显示包含搜索文本的缺陷
+            Defects = new ObservableCollection<DefectViewModel>(
+                allDefects.Where(d => d.ComponentPart.Contains(FilterText) ||
+                                      d.DefectType.Contains(FilterText) ||
+                                      d.DefectLocation.Contains(FilterText) ||
+                                      d.DefectSeverity.Contains(FilterText) ||
+                                      d.Note.Contains(FilterText)));
         }
     }
 
