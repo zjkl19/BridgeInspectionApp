@@ -39,17 +39,22 @@ public partial class BridgeListViewModel : ObservableObject
     }
     public void FilterBridges(string searchText)
     {
+        using var db = new BridgeContext();
+        var allBridges =  db.Bridges
+                            .Include(b => b.Defects)
+                            .ThenInclude(d => d.Photos)
+                            .ToList(); // 确保从数据库加载所有桥梁和相关的病害及照片
+
         if (string.IsNullOrEmpty(searchText))
         {
             // 如果搜索文本为空，显示所有桥梁
-            Bridges = new ObservableCollection<BridgeViewModel>(Bridges);
+            Bridges = new ObservableCollection<BridgeViewModel>(allBridges.Select(b => new BridgeViewModel(b)));
         }
         else
         {
             // 否则，只显示名称包含搜索文本的桥梁
-            Bridges = new ObservableCollection<BridgeViewModel>(Bridges.Where(b => b.Name.Contains(searchText)));
+            Bridges = new ObservableCollection<BridgeViewModel>(allBridges.Where(b => b.Name.Contains(searchText)).Select(b => new BridgeViewModel(b)));
         }
-        //OnPropertyChanged(nameof(Bridges)); // 通知 UI Bridges 属性已经改变
     }
     private void LoadBridges()
     {

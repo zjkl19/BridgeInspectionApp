@@ -165,7 +165,7 @@ public partial class BridgeViewModel : BaseViewModel
         await Application.Current.MainPage.Navigation.PopAsync();
     }
     [RelayCommand]
-    private async Task ExecuteAddConfirmedCommand(BridgeViewModel bridgeViewModel)
+    public async Task ExecuteAddConfirmedCommand(BridgeViewModel bridgeViewModel)
     {
         if (string.IsNullOrWhiteSpace(Name))
         {

@@ -63,7 +63,7 @@ public partial class App : Application
                 Current.MainPage.DisplayAlert("权限拒绝", "无法访问存储。", "确定"));
         }
     }
-    public void SeedDatabase(BridgeContext db)
+    public static void SeedDatabase(BridgeContext db)
     {
         try
         {
@@ -87,7 +87,7 @@ public partial class App : Application
         }
     }
 
-    private List<Bridge> InitializeBridgesData()
+    public static List<Bridge> InitializeBridgesData()
     {
         string timestamp = DateTime.Now.ToString("yyyyMMddTHHmmssfff");  // 加上毫秒确保唯一性
         // 创建武汉长江大桥和南京长江大桥的数据
@@ -188,7 +188,7 @@ public partial class App : Application
 
         return new List<Bridge> { bridge1, bridge2 };
     }
-    public string CreatePublicPhotoPath(string filename)
+    public static string CreatePublicPhotoPath(string filename)
     {
         string folderName = "桥梁巡查"; // 应用的名称，用于创建子文件夹
         string folderPath=string.Empty;
@@ -247,7 +247,7 @@ public partial class App : Application
         return fileName;
     }
 
-    private string CreateTestPhoto(string filePath)
+    public static string CreateTestPhoto(string filePath)
     {
         // Check if file already exists to avoid overwriting
         if (!File.Exists(filePath))
@@ -276,7 +276,7 @@ public partial class App : Application
         return filePath;
     }
 
-    private string CreateTextPhoto(string filePath, string text, bool overwrite = true)
+    public static string CreateTextPhoto(string filePath, string text, bool overwrite = true)
     {
         // Check if file already exists to decide on overwriting
         if (overwrite || !File.Exists(filePath))
