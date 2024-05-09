@@ -8,9 +8,34 @@
 
     <VerticalStackLayout Spacing="25" Padding="30" VerticalOptions="Center">
         <!--<Button Text="选择桥梁" Clicked="SelectBridge_Clicked"/>-->
+        <Button Text="注意事项"
+            Clicked="OnNoticeClicked"
+            VerticalOptions="EndAndExpand" 
+            HorizontalOptions="Center" 
+            BackgroundColor="Blue"/>
         <Button Text="查看桥梁信息" 
                 VerticalOptions="CenterAndExpand" 
                 Clicked="OnViewInfoClicked"/>
+        <Label Text="© 2024 福建省建筑科学研究院有限责任公司" 
+               FontSize="13"
+               HorizontalOptions="Center" 
+               VerticalOptions="EndAndExpand" />
+        <Label Text="福建省建筑工程质量检测中心有限公司" 
+               FontSize="13"
+               HorizontalOptions="Center" 
+               VerticalOptions="EndAndExpand" />
+        <Label Text="路桥检测研究所" 
+               FontSize="13"
+               HorizontalOptions="Center" 
+               VerticalOptions="EndAndExpand" />
+        <Label Text="All rights reserved." 
+               FontSize="13"
+               HorizontalOptions="Center" 
+               VerticalOptions="EndAndExpand" />
+        <Label Text="Version 1.0.0"
+               FontSize="13"
+               HorizontalOptions="Center" 
+               VerticalOptions="EndAndExpand" />
     </VerticalStackLayout>
     
 
