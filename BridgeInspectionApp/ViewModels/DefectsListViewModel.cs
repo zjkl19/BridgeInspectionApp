@@ -30,8 +30,8 @@ public partial class DefectsListViewModel : ObservableObject
             FilterDefects();
         }
     }
-
-    private BridgeViewModel _bridgeViewModel;
+    [ObservableProperty]
+    public BridgeViewModel _bridgeViewModel;
     [ObservableProperty]
     public ObservableCollection<DefectViewModel> defects;
     public ICommand DeleteCommand { get; private set; }

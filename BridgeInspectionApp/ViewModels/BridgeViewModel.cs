@@ -9,50 +9,29 @@ using Microsoft.EntityFrameworkCore;
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Input;
 using BridgeInspectionApp.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace BridgeInspectionApp.ViewModels;
 
-public partial class BridgeViewModel : BaseViewModel
+public partial class BridgeViewModel : ObservableObject
 {
-    public ICommand DeleteBridgeCommand { get; }
+    [ObservableProperty]
+    public bool isSelected;
     
-    private Bridge _bridge;
-    private string _name;
-    private string? _location;
-    private string? _mapId;
+    [ObservableProperty]
+    public Bridge bridge;
+    [ObservableProperty]
+    public Guid id;
+    [ObservableProperty]
+    public string name;
+    [ObservableProperty]
+    public string? location;
+    [ObservableProperty]
+    public string? mapId;
+    [ObservableProperty]
+    public ObservableCollection<DefectViewModel> defects;
 
-    public Guid Id
-    {
-        get => _bridge.Id;
-        set
-        {
-            if (_bridge.Id != value)
-            {
-                _bridge.Id = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public string Name
-    {
-        get => _name;
-        set => SetProperty(ref _name, value);
-    }
-
-    public string? Location
-    {
-        get => _location;
-        set => SetProperty(ref _location, value);
-    }
-
-    public string? MapId
-    {
-        get => _mapId;
-        set => SetProperty(ref _mapId, value);
-    }
-
-    public ObservableCollection<DefectViewModel> Defects { get; set; }
+    public ICommand DeleteBridgeCommand { get; }
     public ICommand ManageDefectsCommand { get; }
     public ICommand EditBridgeCommand { get; }
     public ICommand EditConfirmedCommand { get;}
@@ -72,10 +51,10 @@ public partial class BridgeViewModel : BaseViewModel
     }
     public BridgeViewModel(Bridge bridge)
     {
-        _bridge = bridge ?? new Bridge { Defects = [] };
-        _name = bridge.Name;
-        _location = bridge.Location;
-        _mapId = bridge.MapId;
+        bridge = bridge ?? new Bridge { Defects = [] };
+        name = bridge.Name;
+        location = bridge.Location;
+        mapId = bridge.MapId;
 
         Defects = [];
         foreach (var defect in bridge.Defects)
@@ -133,7 +112,7 @@ public partial class BridgeViewModel : BaseViewModel
     {
         var navigation = Application.Current.MainPage.Navigation;
         // 假设 BridgeEditPage 是编辑桥梁的页面
-        navigation.PushAsync(new BridgeEditPage(new BridgeViewModel(_bridge)));
+        navigation.PushAsync(new BridgeEditPage(new BridgeViewModel(bridge)));
     }
     [RelayCommand]
     private async Task ExecuteEditConfirmedCommand(BridgeViewModel bridgeViewModel)

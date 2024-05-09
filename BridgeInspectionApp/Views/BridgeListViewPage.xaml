@@ -15,24 +15,34 @@
                 Command="{Binding BridgeAddCommand}"
                 HorizontalOptions="Center"
                 Margin="10"/>
+        <Button Text="打包所选"
+        Command="{Binding PackSelectedCommand}"
+        HorizontalOptions="Center"
+        Margin="10"/>
         <ScrollView>
             <VerticalStackLayout>
-                <CollectionView x:Name="bridgesCollection"  ItemsSource="{Binding Bridges}">
+                <CollectionView x:Name="bridgesCollection"  ItemsSource="{Binding Bridges}"
+                                                            SelectedItem="{Binding SelectedBridge}"
+                                                            SelectionMode="Multiple">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Frame BorderColor="LightGray" Margin="10" Padding="10">
-                                <VerticalStackLayout>
-                                    <Label Text="{Binding Name}" FontSize="Medium" />
-                                    <Label Text="{Binding Location}" FontSize="Small" />
-                                    <HorizontalStackLayout Spacing="10">
-                                        <!--<Button Text="编辑" BackgroundColor="Blue" Clicked="OnEditClicked" />
-                                    <Button Text="删除" BackgroundColor="Red" Clicked="OnDeleteClicked" />
-                                    <Button Text="病害管理" BackgroundColor="Green" Clicked="OnManageDefectsClicked" />-->
-                                        <Button Text="编辑" BackgroundColor="Blue" Command="{Binding EditBridgeCommand}" />
-                                        <Button Text="删除" BackgroundColor="Red" Command="{Binding DeleteBridgeCommand}"  CommandParameter="{Binding}"/>
-                                        <Button Text="病害管理" BackgroundColor="Green" Command="{Binding ManageDefectsCommand}" CommandParameter="{Binding .}"/>
-                                    </HorizontalStackLayout>
-                                </VerticalStackLayout>
+                                <HorizontalStackLayout>
+                                    <CheckBox IsChecked="{Binding IsSelected}" Scale="1.5"/>
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Name}" FontSize="Medium" />
+                                        <Label Text="{Binding Location}" FontSize="Small" />
+                                        <HorizontalStackLayout Spacing="10">
+                                            <!--<Button Text="编辑" BackgroundColor="Blue" Clicked="OnEditClicked" />
+    <Button Text="删除" BackgroundColor="Red" Clicked="OnDeleteClicked" />
+    <Button Text="病害管理" BackgroundColor="Green" Clicked="OnManageDefectsClicked" />-->
+                                            <Button Text="编辑" BackgroundColor="Blue" Command="{Binding EditBridgeCommand}" />
+                                            <Button Text="删除" BackgroundColor="Red" Command="{Binding DeleteBridgeCommand}"  CommandParameter="{Binding}"/>
+                                            <Button Text="病害管理" BackgroundColor="Green" Command="{Binding ManageDefectsCommand}" CommandParameter="{Binding .}"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+                                        
                             </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>

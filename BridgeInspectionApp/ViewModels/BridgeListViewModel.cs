@@ -11,6 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.IO.Compression;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 
 namespace BridgeInspectionApp.ViewModels;
 
@@ -18,9 +20,12 @@ public partial class BridgeListViewModel : ObservableObject
 {
     [ObservableProperty]
     public ObservableCollection<BridgeViewModel> bridges;
+    [ObservableProperty]
+
+    public ObservableCollection<BridgeViewModel> selectedBridges;
     public ICommand LoadBridgesCommand { get; }
     public ICommand BridgeAddCommand { get; }
-
+    public ICommand PackSelectedCommand { get; }
     public BridgeListViewModel()
     {
         Bridges = [];
@@ -32,9 +37,12 @@ public partial class BridgeListViewModel : ObservableObject
                 Bridges.Remove(bridge);
             }
         });
-        LoadBridgesCommand = new Command(async () => await LoadBridgesAsync());
+        
         LoadBridges();
+
+        LoadBridgesCommand = new Command(async () => await LoadBridgesAsync());
         BridgeAddCommand = new RelayCommand(async () => await ExecuteBridgeAddCommand());
+        PackSelectedCommand = new Command(async () => await PackSelected());
 
     }
     public void FilterBridges(string searchText)
@@ -102,6 +110,52 @@ public partial class BridgeListViewModel : ObservableObject
         await Application.Current.MainPage.Navigation.PushAsync(new BridgeAddPage ());
     }
 
+    private async Task PackSelected()
+    {
 
+        // 获取所选桥梁的所有照片
+        var selectedBridgePhotos = GetSelectedBridgePhotos();
 
+        // 定义压缩文件的路径
+        //string zipFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SelectedBridgePhotos.zip");
+        //string folderPath = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures).AbsolutePath, "桥梁巡查", "打包");
+        string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "桥梁巡查", "打包");
+
+        Directory.CreateDirectory(folderPath); // 确保目录存在
+        string zipFilePath = Path.Combine(folderPath, "选中的桥梁照片.zip");
+
+        // 创建一个新的ZipArchive来保存照片
+        using var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create);
+        foreach (var photo in selectedBridgePhotos)
+        {
+            // 将照片添加到压缩文件中
+            archive.CreateEntryFromFile(photo.FilePath, Path.GetFileName(photo.FilePath));
+        }
+    }
+    private List<BridgePhoto> GetSelectedBridgePhotos()
+    {
+
+        SelectedBridges = new ObservableCollection<BridgeViewModel>(Bridges.Where(b => b.IsSelected).ToList());
+        var selectedBridgePhotos = new List<BridgePhoto>();
+
+        foreach (var bridge in SelectedBridges)
+        {
+            foreach (var defect in bridge.Defects)
+            {
+                foreach (var photo in defect.Photos)
+                {
+                    selectedBridgePhotos.Add(new BridgePhoto
+                    {
+                        FilePath = photo.FilePath,
+                    });
+                }
+            }
+        }
+
+        return selectedBridgePhotos;
+    }
+    public class BridgePhoto
+    {
+        public string FilePath { get; set; }    //包含了文件名
+    }
 }
