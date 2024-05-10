@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.IO.Compression;
 using Microsoft.Maui.Controls.PlatformConfiguration;
+using BridgeInspectionApp.Services;
 
 namespace BridgeInspectionApp.ViewModels;
 
@@ -126,10 +127,13 @@ public partial class BridgeListViewModel : ObservableObject
         List<string> bridgeZipFiles = new List<string>();
 
         // 对于每个选中的桥梁，创建一个以桥梁名称命名的压缩文件
-        // 对于每个选中的桥梁，创建一个以桥梁名称命名的压缩文件
         foreach (var bridgePhotos in selectedBridgePhotos)
         {
             string bridgeZipFilePath = Path.Combine(folderPath, $"{bridgePhotos.Key}.zip");
+            if (File.Exists(bridgeZipFilePath))
+            {
+                File.Delete(bridgeZipFilePath);
+            }
             using var bridgeArchive = ZipFile.Open(bridgeZipFilePath, ZipArchiveMode.Create);
             foreach (var bridgePhotoPair in bridgePhotos)
             {
@@ -145,15 +149,7 @@ public partial class BridgeListViewModel : ObservableObject
         string zipFilePath = Path.Combine(folderPath, "选中的桥梁照片.zip");
         if (File.Exists(zipFilePath))
         {
-            bool overwrite = await Application.Current.MainPage.DisplayAlert("提示", "文件已经存在，是否要覆盖？", "是", "否");
-            if (!overwrite)
-            {
-                return;
-            }
-            else
-            {
-                File.Delete(zipFilePath);
-            }
+            File.Delete(zipFilePath);
         }
         using var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create);
         foreach (var bridgeZipFile in bridgeZipFiles)
@@ -162,14 +158,35 @@ public partial class BridgeListViewModel : ObservableObject
         }
 
         archive.Dispose(); // 显式释放ZipArchive对象
-        await ShareFile(zipFilePath);
+        //await ShareFile(zipFilePath);
+        // 创建 Word 文档
+        string wordFilePath = Path.Combine(folderPath, "桥梁信息.docx");
+        if (File.Exists(wordFilePath))
+        {
+            File.Delete(wordFilePath);
+        }
+        WordDocumentCreator creator = new();
+        creator.CreateWordDocument(wordFilePath, SelectedBridges.SelectMany(b => b.Defects).ToList());
+
+        // 创建一个新的压缩文件，将所有桥梁的压缩文件和 Word 文档添加到这个新的压缩文件中
+        string finalZipFilePath = Path.Combine(folderPath, "选中的桥梁照片和信息.zip");
+        if (File.Exists(finalZipFilePath))
+        {
+            File.Delete(finalZipFilePath);
+        }
+        using var finalArchive = ZipFile.Open(finalZipFilePath, ZipArchiveMode.Create);
+        finalArchive.CreateEntryFromFile(zipFilePath, Path.GetFileName(zipFilePath));
+        finalArchive.CreateEntryFromFile(wordFilePath, Path.GetFileName(wordFilePath));
+        finalArchive.Dispose();
+        // 分享最终的压缩文件
+        await ShareFile(finalZipFilePath);
     }
 
     public async Task ShareFile(string filePath)
     {
         await Share.RequestAsync(new ShareFileRequest
         {
-            Title = "分享桥梁照片压缩包",
+            Title = "分享桥梁照片和信息",
             File = new ShareFile(filePath)
         });
     }
@@ -199,5 +216,19 @@ public partial class BridgeListViewModel : ObservableObject
     public class BridgePhoto
     {
         public string FilePath { get; set; }    //包含了文件名
+    }
+
+    public async Task ShareFiles(List<string> filePaths)
+    {
+        var shareFileRequests = filePaths.Select(fp => new ShareFileRequest
+        {
+            Title = "分享桥梁照片和信息",
+            File = new ShareFile(fp)
+        }).ToList();
+
+        foreach (var request in shareFileRequests)
+        {
+            await Share.RequestAsync(request);
+        }
     }
 }
