@@ -18,12 +18,26 @@ public class WordDocumentCreator
             mainPart.Document = new Document();
             Body body = mainPart.Document.AppendChild(new Body());
 
-            foreach (var defect in defects)
+            // 定义表格的列
+            var columns = new List<(string Header, string Width)>
+            {
+                  ("构件部位", CmToTwips(2)),
+                ("病害类型", CmToTwips(2)),
+                ("缺损位置", CmToTwips(2)),
+                ("缺损程度", CmToTwips(1)),
+                ("缺陷备注", CmToTwips(1)),
+                ("照片名字", CmToTwips(3))
+            };
+
+            // 按桥梁名称分组
+            var groupedDefects = defects.GroupBy(d => d.BridgeName);
+
+            foreach (var bridgeDefects in groupedDefects)
             {
                 // 添加桥梁名称
                 Paragraph para = body.AppendChild(new Paragraph());
                 Run run = para.AppendChild(new Run());
-                run.AppendChild(new Text($"桥梁名称: {defect.BridgeName}"));
+                run.AppendChild(new Text($"桥梁名称: {bridgeDefects.Key}"));
                 run.AppendChild(new Break());
 
                 // 创建表格
@@ -31,27 +45,48 @@ public class WordDocumentCreator
 
                 // 创建表头
                 TableRow headerRow = new TableRow();
-                headerRow.Append(
-                    new TableCell(new Paragraph(new Run(new Text("构件部位")))),
-                    new TableCell(new Paragraph(new Run(new Text("病害类型")))),
-                    new TableCell(new Paragraph(new Run(new Text("照片名字")))));
+                foreach (var column in columns)
+                {
+                    headerRow.Append(CreateCell(column.Header, column.Width));
+                }
                 table.Append(headerRow);
 
                 // 添加病害信息
-                TableRow row = new TableRow();
-                row.Append(
-                    new TableCell(new Paragraph(new Run(new Text(defect.ComponentPart)))),
-                    new TableCell(new Paragraph(new Run(new Text(defect.DefectType)))),
-                    new TableCell(new Paragraph(new Run(new Text(string.Join(", ", defect.Photos.Select(p => Path.GetFileName(p.FilePath))))))));
+                foreach (var defect in bridgeDefects)
+                {
+                    TableRow row = new TableRow();
+                    row.Append(
+                        CreateCell(defect.ComponentPart, columns[0].Width),
+                        CreateCell(defect.DefectType, columns[1].Width),
+                        CreateCell(defect.DefectLocation, columns[2].Width),
+                        CreateCell(defect.DefectSeverity, columns[3].Width),
+                        CreateCell(defect.Note, columns[4].Width),
+                        CreateCell(string.Join(", ", defect.Photos.Select(p => Path.GetFileName(p.FilePath))), columns[5].Width));
 
-                table.Append(row);
+                    table.Append(row);
+                }
 
                 // 将表格添加到文档中
                 body.AppendChild(table);
+
             }
+
         }
     }
-
+    private string CmToTwips(double cm)
+    {
+        // 1 英寸 = 2.54 厘米
+        // 1 英寸 = 1440 Twips
+        double twips = (cm / 2.54) * 1440;
+        return ((int)twips).ToString();
+    }
+    private TableCell CreateCell(string text, string width)
+    {
+        return new TableCell(new Paragraph(new Run(new Text(text))))
+        {
+            TableCellProperties = new TableCellProperties { TableCellWidth = new TableCellWidth { Width = width } }
+        };
+    }
 
 
 }
