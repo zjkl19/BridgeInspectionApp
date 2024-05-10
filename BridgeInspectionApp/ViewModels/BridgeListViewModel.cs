@@ -37,7 +37,11 @@ public partial class BridgeListViewModel : ObservableObject
                 Bridges.Remove(bridge);
             }
         });
-        
+        WeakReferenceMessenger.Default.Register<Messages.BridgeUpdatedMessage>(this, (recipient, message) =>
+        {
+            LoadBridges();
+        });
+
         LoadBridges();
 
         LoadBridgesCommand = new Command(async () => await LoadBridgesAsync());

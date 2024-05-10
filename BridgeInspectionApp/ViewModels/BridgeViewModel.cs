@@ -17,7 +17,7 @@ public partial class BridgeViewModel : ObservableObject
 {
     [ObservableProperty]
     public bool isSelected;
-    
+
     [ObservableProperty]
     public Bridge bridge;
     [ObservableProperty]
@@ -34,7 +34,7 @@ public partial class BridgeViewModel : ObservableObject
     public ICommand DeleteBridgeCommand { get; }
     public ICommand ManageDefectsCommand { get; }
     public ICommand EditBridgeCommand { get; }
-    public ICommand EditConfirmedCommand { get;}
+    public ICommand EditConfirmedCommand { get; }
     public ICommand EditCancelCommand { get; }
 
     public ICommand AddConfirmedCommand { get; }
@@ -153,30 +153,33 @@ public partial class BridgeViewModel : ObservableObject
             return;
         }
 
-        using (var db = new BridgeContext())
-        {
-            bool exists = await db.Bridges.AnyAsync(b => b.Name == Name);
-            if (exists)
-            {
-                await Application.Current.MainPage.DisplayAlert("错误", "桥梁名称已存在。请使用不同的名称。", "确定");
-                return;
-            }
+        using var db = new BridgeContext();
 
-            // 保存新桥梁
-            var newBridge = new Bridge
-            {
-                Name = bridgeViewModel.Name,
-                Location = bridgeViewModel.Location,
-                MapId = bridgeViewModel.MapId
-            };
-            db.Bridges.Add(newBridge);
-            await db.SaveChangesAsync();
-            await Application.Current.MainPage.DisplayAlert("成功", "桥梁已成功添加。", "确定");
+        bool exists = await db.Bridges.AnyAsync(b => b.Name == Name);
+        if (exists)
+        {
+            await Application.Current.MainPage.DisplayAlert("错误", "桥梁名称已存在。请使用不同的名称。", "确定");
+            return;
         }
+
+        // 保存新桥梁
+        var newBridge = new Bridge
+        {
+            Name = bridgeViewModel.Name,
+            Location = bridgeViewModel.Location,
+            MapId = bridgeViewModel.MapId
+        };
+        db.Bridges.Add(newBridge);
+        await db.SaveChangesAsync();
+        await Application.Current.MainPage.DisplayAlert("成功", "桥梁已成功添加。", "确定");
+
         // 检查是否存在重名桥梁
 
-        
+
         // 可以添加代码以关闭当前页面或更新列表
+
+        // 发送消息通知桥梁已添加
+        WeakReferenceMessenger.Default.Send(new Messages.BridgeUpdatedMessage(newBridge.Id));
     }
     [RelayCommand]
     private async Task ExecuteCancelCommand()
