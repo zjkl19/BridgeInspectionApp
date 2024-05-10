@@ -117,25 +117,37 @@ public partial class BridgeListViewModel : ObservableObject
     private async Task PackSelected()
     {
 
-        // 获取所选桥梁的所有照片
-        var selectedBridgePhotos = GetSelectedBridgePhotos();
+        // 获取所选桥梁的所有照片，按桥梁分组
+        var selectedBridgePhotos = GetSelectedBridgePhotos().GroupBy(p => p.Key);
 
-        // 定义压缩文件的路径
-        //string zipFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SelectedBridgePhotos.zip");
-        //string folderPath = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryPictures).AbsolutePath, "桥梁巡查", "打包");
         string folderPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "桥梁巡查", "打包");
-
         Directory.CreateDirectory(folderPath); // 确保目录存在
-        string zipFilePath = Path.Combine(folderPath, "选中的桥梁照片.zip");
 
-        // 检查文件是否已经存在
+        List<string> bridgeZipFiles = new List<string>();
+
+        // 对于每个选中的桥梁，创建一个以桥梁名称命名的压缩文件
+        // 对于每个选中的桥梁，创建一个以桥梁名称命名的压缩文件
+        foreach (var bridgePhotos in selectedBridgePhotos)
+        {
+            string bridgeZipFilePath = Path.Combine(folderPath, $"{bridgePhotos.Key}.zip");
+            using var bridgeArchive = ZipFile.Open(bridgeZipFilePath, ZipArchiveMode.Create);
+            foreach (var bridgePhotoPair in bridgePhotos)
+            {
+                foreach (var photo in bridgePhotoPair.Value)
+                {
+                    bridgeArchive.CreateEntryFromFile(photo.FilePath, Path.GetFileName(photo.FilePath));
+                }
+            }
+            bridgeZipFiles.Add(bridgeZipFilePath);
+        }
+
+        // 创建一个新的压缩文件，将所有桥梁的压缩文件添加到这个新的压缩文件中
+        string zipFilePath = Path.Combine(folderPath, "选中的桥梁照片.zip");
         if (File.Exists(zipFilePath))
         {
-            // 如果文件已经存在，提示用户是否要覆盖文件
             bool overwrite = await Application.Current.MainPage.DisplayAlert("提示", "文件已经存在，是否要覆盖？", "是", "否");
             if (!overwrite)
             {
-                // 如果用户选择不覆盖文件，直接返回
                 return;
             }
             else
@@ -143,14 +155,12 @@ public partial class BridgeListViewModel : ObservableObject
                 File.Delete(zipFilePath);
             }
         }
-
-        // 创建一个新的ZipArchive来保存照片
         using var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create);
-        foreach (var photo in selectedBridgePhotos)
+        foreach (var bridgeZipFile in bridgeZipFiles)
         {
-            // 将照片添加到压缩文件中
-            archive.CreateEntryFromFile(photo.FilePath, Path.GetFileName(photo.FilePath));
+            archive.CreateEntryFromFile(bridgeZipFile, Path.GetFileName(bridgeZipFile));
         }
+
         archive.Dispose(); // 显式释放ZipArchive对象
         await ShareFile(zipFilePath);
     }
@@ -163,24 +173,25 @@ public partial class BridgeListViewModel : ObservableObject
             File = new ShareFile(filePath)
         });
     }
-    private List<BridgePhoto> GetSelectedBridgePhotos()
+    private Dictionary<string, List<BridgePhoto>> GetSelectedBridgePhotos()
     {
-
         SelectedBridges = new ObservableCollection<BridgeViewModel>(Bridges.Where(b => b.IsSelected).ToList());
-        var selectedBridgePhotos = new List<BridgePhoto>();
+        var selectedBridgePhotos = new Dictionary<string, List<BridgePhoto>>();
 
         foreach (var bridge in SelectedBridges)
         {
+            var bridgePhotos = new List<BridgePhoto>();
             foreach (var defect in bridge.Defects)
             {
                 foreach (var photo in defect.Photos)
                 {
-                    selectedBridgePhotos.Add(new BridgePhoto
+                    bridgePhotos.Add(new BridgePhoto
                     {
                         FilePath = photo.FilePath,
                     });
                 }
             }
+            selectedBridgePhotos.Add(bridge.Name, bridgePhotos);
         }
 
         return selectedBridgePhotos;

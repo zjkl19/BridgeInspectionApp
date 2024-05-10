@@ -14,10 +14,12 @@
         <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
             <Button Text="添加桥梁"
             Command="{Binding BridgeAddCommand}"
-            Margin="10"/>
+            Margin="10"
+            BackgroundColor="Blue"/>
             <Button Text="打包所选"
             Command="{Binding PackSelectedCommand}"
-            Margin="10"/>
+            Margin="10"
+            BackgroundColor="Green"/>
         </HorizontalStackLayout>
         <ScrollView>
             <VerticalStackLayout>
