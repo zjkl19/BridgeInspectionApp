@@ -124,6 +124,22 @@ public partial class BridgeListViewModel : ObservableObject
         Directory.CreateDirectory(folderPath); // 确保目录存在
         string zipFilePath = Path.Combine(folderPath, "选中的桥梁照片.zip");
 
+        // 检查文件是否已经存在
+        if (File.Exists(zipFilePath))
+        {
+            // 如果文件已经存在，提示用户是否要覆盖文件
+            bool overwrite = await Application.Current.MainPage.DisplayAlert("提示", "文件已经存在，是否要覆盖？", "是", "否");
+            if (!overwrite)
+            {
+                // 如果用户选择不覆盖文件，直接返回
+                return;
+            }
+            else
+            {
+                File.Delete(zipFilePath);
+            }
+        }
+
         // 创建一个新的ZipArchive来保存照片
         using var archive = ZipFile.Open(zipFilePath, ZipArchiveMode.Create);
         foreach (var photo in selectedBridgePhotos)
@@ -131,6 +147,17 @@ public partial class BridgeListViewModel : ObservableObject
             // 将照片添加到压缩文件中
             archive.CreateEntryFromFile(photo.FilePath, Path.GetFileName(photo.FilePath));
         }
+        archive.Dispose(); // 显式释放ZipArchive对象
+        await ShareFile(zipFilePath);
+    }
+
+    public async Task ShareFile(string filePath)
+    {
+        await Share.RequestAsync(new ShareFileRequest
+        {
+            Title = "分享桥梁照片压缩包",
+            File = new ShareFile(filePath)
+        });
     }
     private List<BridgePhoto> GetSelectedBridgePhotos()
     {
