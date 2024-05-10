@@ -17,11 +17,6 @@ public partial class BridgeListViewPage : ContentPage
         BindingContext = new BridgeListViewModel();
     }
 
-    //protected override void OnAppearing()
-    //{
-    //    base.OnAppearing();
-    //    _viewModel.LoadBridgesCommand.Execute(null);
-    //}
 
     private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
     {

@@ -36,8 +36,8 @@
                                             <!--<Button Text="编辑" BackgroundColor="Blue" Clicked="OnEditClicked" />
     <Button Text="删除" BackgroundColor="Red" Clicked="OnDeleteClicked" />
     <Button Text="病害管理" BackgroundColor="Green" Clicked="OnManageDefectsClicked" />-->
-                                            <Button Text="编辑" BackgroundColor="Blue" Command="{Binding EditBridgeCommand}" />
-                                            <Button Text="删除" BackgroundColor="Red" Command="{Binding DeleteBridgeCommand}"  CommandParameter="{Binding}"/>
+                                            <Button Text="编辑" BackgroundColor="Blue" Command="{Binding EditBridgeCommand}"  CommandParameter="{Binding .}"/>
+                                            <Button Text="删除" BackgroundColor="Red" Command="{Binding DeleteBridgeCommand}"  CommandParameter="{Binding .}"/>
                                             <Button Text="病害管理" BackgroundColor="Green" Command="{Binding ManageDefectsCommand}" CommandParameter="{Binding .}"/>
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>

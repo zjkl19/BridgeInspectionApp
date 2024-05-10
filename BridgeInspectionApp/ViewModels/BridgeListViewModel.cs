@@ -107,7 +107,7 @@ public partial class BridgeListViewModel : ObservableObject
     private async Task ExecuteBridgeAddCommand()
     {
         // 打开添加桥梁页面
-        await Application.Current.MainPage.Navigation.PushAsync(new BridgeAddPage ());
+        await Application.Current.MainPage.Navigation.PushAsync(new BridgeAddPage (new BridgeViewModel()));
     }
 
     private async Task PackSelected()

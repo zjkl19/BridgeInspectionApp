@@ -43,15 +43,16 @@ public partial class BridgeViewModel : ObservableObject
     {
         ManageDefectsCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteManageDefectsCommand(bridgeViewModel));
         DeleteBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteDeleteBridgeCommand(bridgeViewModel));
-        EditBridgeCommand = new RelayCommand(ExecuteEditBridgeCommand);
+        EditBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditBridgeCommand(bridgeViewModel));
         EditConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditConfirmedCommand(bridgeViewModel));
         EditCancelCommand = new Command(async () => await ExecuteEditCancelCommand());
         AddConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteAddConfirmedCommand(bridgeViewModel));
         CancelCommand = new Command(async () => await ExecuteCancelCommand());
+        AddConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteAddConfirmedCommand(bridgeViewModel));
     }
     public BridgeViewModel(Bridge bridge)
     {
-        bridge = bridge ?? new Bridge { Defects = [] };
+        id = bridge.Id;
         name = bridge.Name;
         location = bridge.Location;
         mapId = bridge.MapId;
@@ -63,7 +64,7 @@ public partial class BridgeViewModel : ObservableObject
         }
         ManageDefectsCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteManageDefectsCommand(bridgeViewModel));
         DeleteBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteDeleteBridgeCommand(bridgeViewModel));
-        EditBridgeCommand = new RelayCommand(ExecuteEditBridgeCommand);
+        EditBridgeCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditBridgeCommand(bridgeViewModel));
         EditConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteEditConfirmedCommand(bridgeViewModel));
         EditCancelCommand = new Command(async () => await ExecuteEditCancelCommand());
         AddConfirmedCommand = new Command<BridgeViewModel>(async (bridgeViewModel) => await ExecuteAddConfirmedCommand(bridgeViewModel));
@@ -108,11 +109,11 @@ public partial class BridgeViewModel : ObservableObject
         }
     }
 
-    private void ExecuteEditBridgeCommand()
+    private async Task ExecuteEditBridgeCommand(BridgeViewModel bridgeViewModel)
     {
         var navigation = Application.Current.MainPage.Navigation;
-        // 假设 BridgeEditPage 是编辑桥梁的页面
-        navigation.PushAsync(new BridgeEditPage(new BridgeViewModel(bridge)));
+
+        navigation.PushAsync(new BridgeEditPage(bridgeViewModel));
     }
     [RelayCommand]
     private async Task ExecuteEditConfirmedCommand(BridgeViewModel bridgeViewModel)
@@ -152,26 +153,29 @@ public partial class BridgeViewModel : ObservableObject
             return;
         }
 
-        using var db = new BridgeContext();
-        // 检查是否存在重名桥梁
-        bool exists = await db.Bridges.AnyAsync(b => b.Name == Name);
-        if (exists)
+        using (var db = new BridgeContext())
         {
-            await Application.Current.MainPage.DisplayAlert("错误", "桥梁名称已存在。请使用不同的名称。", "确定");
-            return;
+            bool exists = await db.Bridges.AnyAsync(b => b.Name == Name);
+            if (exists)
+            {
+                await Application.Current.MainPage.DisplayAlert("错误", "桥梁名称已存在。请使用不同的名称。", "确定");
+                return;
+            }
+
+            // 保存新桥梁
+            var newBridge = new Bridge
+            {
+                Name = bridgeViewModel.Name,
+                Location = bridgeViewModel.Location,
+                MapId = bridgeViewModel.MapId
+            };
+            db.Bridges.Add(newBridge);
+            await db.SaveChangesAsync();
+            await Application.Current.MainPage.DisplayAlert("成功", "桥梁已成功添加。", "确定");
         }
+        // 检查是否存在重名桥梁
 
-        // 保存新桥梁
-        var newBridge = new Bridge
-        {
-            Name = bridgeViewModel.Name,
-            Location = bridgeViewModel.Location,
-            MapId = bridgeViewModel.MapId
-        };
-        db.Bridges.Add(newBridge);
-        await db.SaveChangesAsync();
-
-        await Application.Current.MainPage.DisplayAlert("成功", "桥梁已成功添加。", "确定");
+        
         // 可以添加代码以关闭当前页面或更新列表
     }
     [RelayCommand]

@@ -4,8 +4,9 @@ namespace BridgeInspectionApp.Views;
 
 public partial class BridgeAddPage : ContentPage
 {
-	public BridgeAddPage()
+	public BridgeAddPage(BridgeViewModel viewModel)
 	{
 		InitializeComponent();
+        BindingContext = viewModel;
     }
 }
